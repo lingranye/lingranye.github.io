@@ -1,0 +1,2175 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Jobble Map</title>
+<link href="CSS/style.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="CSS/auto.css">
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+<script src="JS/jquery-1.9.1.js"></script>
+<script src="JS/jquery-ui.js"></script>
+<script src="JS/d3.v3.min.js" charset="utf-8"></script>
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<link rel="icon" type="image/png" href="img/favicon.png"/>
+
+<style type="text/css">
+@font-face {
+    font-family: "ProximaNova";
+    src: url(CSS/ProximaNova-Reg.otf) format("opentype");
+}
+p.customfont { 
+    font-family: "ProximaNova", Verdana, Tahoma;
+    font-size:13px;
+    color:White;    
+
+}
+</style>
+
+</head>
+<body>
+
+
+<!-- Favorite List   contents are moved to the last-->
+<div id="favorite">
+<div class="favoritetitle" class="customfont">Favorite<p class="num_favorite"></p></div>
+<div class="favorite1" class="customfont"></div>
+<div class="favorite2" class="customfont"></div>
+
+</div>
+
+<div id = "filter_frame">
+
+
+
+
+    <img src="img/logo.png" />
+    <p><br /></p>
+	<input type="text" name="searchBar" id="autocomplete" size="48" placeholder="Search for an occupation..."/>
+	<input type="submit" value="" id="submit" name="search" onclick="prepareSearch()" style="background-image:url(img/search.png); background-repeat:no-repeat;"/>
+	<!-- Occupation High level drop down box -->
+	<p class = "customfont" style = "margin-left:-1px" id="title1"><span id="title1_sp">Job Category</span></p>
+    
+	<p class = "customfont" id = "map_title">Job Opportunity</p>
+	<p class = "customfont" id="selectedOccupation"></p>
+	<!-- Search Bar. Maybe we could add autocomplete function into the search bar -->
+	<!-- Filter -->
+
+	<!-- 
+	Occupation
+	High level drop down box
+	 -->
+    <label for = "dropdown">
+	    <select id="occupation">
+	    </select>
+    </label>
+
+	<!-- more detail occupation drop down box -->
+    <label for = "dropdown" id = "occupation_small_label">
+	    <select id="occupation_small">
+	    </select>
+    </label>
+	
+	<!--  Salary Annual -->
+	
+  
+	<p class = "customfont" id="title2"><span id="title2_sp">Salary</span></p>
+	<p>
+	  <!--  <label for="amount">Salary range:</label> -->
+	  <input type="text" id="amount" style="border:0; color:#d1d2d4; font-family:Proxima Nova Rg;text-align:center; background-color:#808284"; >
+	</p>
+
+	<div id="slider-range" ></div>
+
+	
+	<div id="two_dopdowns"
+	<!-- State drop down box -->
+	<p class = "customfont" id="title3">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<span id="title3_sp1">State</span>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<span id="title3_sp2">Job Popularity</span></p>
+
+    <label for = "dropdown">
+	    <select id="statedropdown">
+	    </select>
+    </label>
+
+
+
+
+	<!-- job popularity -->
+	<div id="job_popu_frame">
+        <label for = "dropdown">
+		<select id="jobpopularity">
+		 <option value="Null">All</option>
+		 <option value="super">Super</option>
+		 <option value="high">High</option>
+		 <option value="medium">Medium</option>
+		 <option value="low">Low</option> 
+		</select> 
+        </label>              
+	</div>
+    </div>
+
+	<!-- HeatMap -->
+
+	<p class = "customfont" id="title4"><span id="title4_sp"> Data Type</span></p>
+	<form id="heatmap">
+		<div id = "data_type_frame">
+
+			<input type="radio" name="heatmap" value="2" checked id="r1">
+			<!--<label class = heat_map_label">Job Opportunity</label>	-->
+            <label id = "rb1" for="r1" title="Estimated total employment (excludes self-employed)"><span>Job Opportunity</span></label>
+			
+			<input type="radio" name="heatmap" value="3" id="r2">
+		    <!--<label class = heat_map_label">Job Popularity</label>-->
+			<label id = "rb2" for="r2" title="The location quotient represents the ratio of an occupation's share of employment in a given area to that occupation's share of employment in the U.S. as a whole."><span>Job Popularity</span></label>
+
+			<input type="radio" name="heatmap" value="4" id="r3">
+			<!--<label class = heat_map_label">Salary</label>-->
+            <label id = "rb3" for="r3" title="Mean annual wage"><span>Salary</span></label>
+			
+			<input type="radio" name="heatmap" value="1" id="r4">
+			<!--<label class = heat_map_label">Unemployment Rate</label>-->
+            <label id = "rb4" for="r4" title="Check the unemployment rate"><span>Unemployment Rate</span></label>
+
+			
+		</div>
+
+	</form>
+
+
+</div>
+
+
+<!-- Map -->
+<div id = "map_frame">
+	<div id="map"></div>
+</div>
+
+
+<!-- Summary and compare part -->
+<!-- <p>
+<h1>Summary and compare</h1>
+Here is bar chart.
+</p> -->
+
+<div id = "summary_frame">
+	<div id="comparelist"></div>
+<!-- The place of summary chart (compare chart) and the button -->
+    <div class="change" >
+    <a href="#chart1" onclick="change();"> <img src="img/arrow_button_right.png" /> </a> <!-- <img src="img/arrow_button_right.png" />-->
+    </div>
+
+    <div id="chart1"></div>
+    <div id="chart2"></div>
+</div>
+
+<div id = "favoritecar_list"></div>
+
+<script>
+
+readdata();
+
+function readdata(){
+	nation = [];
+	state1 = [];
+	state2 = [];
+	state = [];
+	unemployment = [];
+	category=[];
+	smallcategory=[];
+	mapdata=[];
+	heatmap=2;//set intial heatmap option as job opportunity
+	selectocc=[];
+	sortdata=[];
+	mapcolor=[];
+	firstTime=1;
+	//initiate compare list
+  comparecount=0;
+  comparelist=[];
+  strokecolor="yellow";
+
+	colorpalette=[[],
+	// ["#E14B4B"，"#F2787A"，"#F69B9D"，"#F9BCBD"，"#FACECE"],
+	// ["#3EA450"，"#71C27E"，"#A7D59E"，"#C0E0B5"，"#D2E9CE"],
+	["#E14B4B","#F2787A","#F69B9D","#F9BCBD","#FACECE"],
+	["#3EA450","#71C27E","#A7D59E","#C0E0B5","#D2E9CE"],
+	["#F68B1E","#FAAE53","#FDC783","#FED8AB","#FFECD5"],
+	
+	["#09719E","#4398C6","#83B6D3","#C6DCE7","#E1EDF1"]
+	// ["#09719E"，"#4398C6"，"#83B6D3"，"#C6DCE7"，"#E1EDF1"]
+	];
+	queue()
+	.defer(d3.csv,"Data/nation.csv",function(d){ 
+		nation.push(
+		{occ_code1:d.OCC_CODE1,      // occupation code
+		 occ_code2:d.OCC_CODE2,
+		 occ_title:d.OCC_TITLE,    // occupation title
+		 tot_emp:+d.TOT_EMP,       // total number of employments
+		 a_mean:+d.A_MEAN          // average annual wage
+		});
+	 })
+	.defer(d3.csv,"Data/state1.csv",function(d){   // state from A - M
+			state1.push(
+			{id:d.id,                  // state id
+			 st:d.ST,                  // state code
+			 state:d.STATE,            // state name
+			 occ_code1:d.OCC_CODE1,      // occupation code
+			 occ_code2:d.OCC_CODE2,  	 
+			 occ_title:d.OCC_TITLE,    // occupation title
+			 tot_emp:+d.TOT_EMP,       // total number of employments
+			 loc_q:+d.LOC_Q,           // location quotient
+			 a_mean:+d.A_MEAN          // average annual wage 
+			});
+	 })
+	.defer(d3.csv,"Data/state2.csv",function(d){   // state after N
+			state2.push(
+			{id:d.id,                  // state id
+			 st:d.ST,                  // state code
+			 state:d.STATE,            // state name
+			 occ_code1:d.OCC_CODE1,      // occupation code
+			 occ_code2:d.OCC_CODE2,  	 
+			 occ_title:d.OCC_TITLE,    // occupation title
+			 tot_emp:+d.TOT_EMP,       // total number of employments
+			 loc_q:+d.LOC_Q,           // location quotient
+			 a_mean:+d.A_MEAN          // average annual wage 
+			});
+	 })
+	.defer(d3.csv,"Data/unemployment.csv",function(d){ 
+		unemployment.push(
+		{id:d.id,                  // state id
+		 st:d.ST,                  // state code
+		 state:d.STATE,            // state name
+		 rate:+d.RATE              // employment rate
+		});
+	 }) 
+	.await(ready);
+}
+
+//Function Ready
+function ready(){
+
+ 	// This function is used to draw the Map. 
+ 	// The hover part use hoverMap function and the click part could use the function clickMap to complete. 
+ 	
+ 	state = d3.merge([state1, state2])   // merge state1 and state2 together
+ 	prepareData();
+ 	drawMap(); 	
+ 	drawSummary1();
+ 	drawSummary2();
+ 	addfavorite();
+ 	addfavoritelist();
+
+}
+
+
+function prepareData(){
+	
+// Clean NaN
+	for (var i=0; i<nation.length; i++){
+		if(isNaN(nation[i].tot_emp))
+			nation[i].tot_emp=null;
+		if(isNaN(nation[i].a_mean))
+			nation[i]. a_mean=null;
+	}
+	for (var i=0; i<state1.length; i++){
+		if(isNaN(state1[i].tot_emp))
+			state1[i].tot_emp=null;
+		if(isNaN(state1[i]. loc_q))
+			state1[i].loc_q=null;
+		if(isNaN(state1[i].a_mean))
+			state1[i].a_mean=null;
+	}
+    for (var i=0; i<state2.length; i++){
+		if(isNaN(state2[i].tot_emp))
+			state2[i].tot_emp=null;
+		if(isNaN(state2[i]. loc_q))
+			state2[i].loc_q=null;
+		if(isNaN(state2[i].a_mean))
+			state2[i].a_mean=null;
+	}	
+	for (var i=0; i<unemployment.length; i++){
+		if(isNaN(unemployment[i].rate))
+			unemployment[i].rate=null;
+	}
+
+	// Define select occupation
+	selectocc['occ_code1']=0
+	selectocc['occ_code2']=0
+	selectocc['occ_title']="All Occupations";
+	
+	
+	// Implement autocomplete search box
+	occupation = []
+	for (var i=1; i<nation.length; i++){
+		if (occupation.indexOf(nation[i].occ_title) == -1 && nation[i]['occ_code2']%10 !=0)
+			occupation.push(nation[i].occ_title)
+	}
+		
+	$( "#autocomplete" ).autocomplete({
+	  source: function( request, response ) {
+			  var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex( request.term ), "i" );
+			  response( $.grep( occupation, function( item ){
+				  return matcher.test( item );
+			  }) );
+		  }
+	});
+
+
+   // Prepare for State filter
+   var opt = d3.select("#statedropdown");
+     opt.on("change", prepareFilter)
+     opt.selectAll("option")
+     	.data(unemployment)
+     	.enter()
+     	.append("option")
+     	.attr("value",function(d,i) {return i;}).text(function(d,i) { mapdata.push([d.state,d.rate]); if (i===0) return "National"; else return d.state;})
+ 	
+   for (var i=0;i<nation.length;i++){
+    	if (nation[i]['occ_code2']==0)
+    		category.push(nation[i]);
+    }
+   var opt1 = d3.selectAll("#occupation");	
+     opt1.on("change", prepareOccupation1)
+     opt1.on("click", prepareOccupation1)
+     opt1.selectAll("option")
+     	.data(category)
+     	.enter()
+     	.append("option")
+     	.attr("value",function(d,i) {return i;}).text(function(d,i) { return d.occ_title;})
+    var j=1;
+	mapdata[0].push(nation[0]['tot_emp']);
+	mapdata[0].push(1);
+	mapdata[0].push(nation[0]['a_mean']);
+	mapdata[0].push(1);
+	for(var i=0;i<state.length;i++){
+		if( state[i]['id']==j && state[i]['occ_code1']==0)
+			{
+				mapdata[j].push(state[i]['tot_emp']);
+				mapdata[j].push(1);
+				mapdata[j].push(state[i]['a_mean']);
+				mapdata[j].push(1);
+				j++;
+				if (j==3) {mapdata[3].push(null); mapdata[3].push(null); mapdata[3].push(null);mapdata[3].push(1); j++;}
+				if (j==7) {mapdata[7].push(null); mapdata[7].push(null); mapdata[7].push(null);mapdata[7].push(1);j++;}
+				if (j==57) break;
+			}
+	}
+	
+	var heatmaptype='r1';
+
+	$(function () {
+
+	    $("#slider-range").slider({
+
+	        range: true,
+
+	        min: 0,
+
+	        max: 150000,
+
+	        values: [0, 150000],
+
+	        step: 5000,
+
+	        slide: function (event, ui) {
+
+	            $("#amount").val("$" + ui.values[0] + " - $" + ui.values[1]);
+
+	        }
+
+	    });
+
+	    $("#amount").val("$" + $("#slider-range").slider("values", 0) +
+
+		  " - $" + $("#slider-range").slider("values", 1));
+
+	    $("#slider-range").on("slidestop", function (event, ui) {
+
+	        prepareFilter();
+
+
+
+	    });
+
+	    $('#jobpopularity').change(function () {
+
+	        prepareFilter();
+
+	        colorpicker();
+
+	        redrawMap();
+
+	        if (summary == true)
+
+	            drawSummary1();
+
+	        else
+
+	            drawSummary2();
+
+	    });
+
+	    $('#r2').click(function () {
+
+	        console.log($('#selectedOccupation').html() == '');
+
+	        console.log($('#selectedOccupation').html() == 'All Occupations');
+
+	        if ($('#selectedOccupation').html() == '' || $('#selectedOccupation').html() == 'All Occupations') {
+
+	            $("#r2").prop("checked", false);
+
+	            console.log(heatmaptype);
+
+	            $('#' + heatmaptype).prop("checked", true);
+
+	            alert("Please choose an occupation before your change to this type of map.");
+
+	        }
+
+	    });
+
+	    $('#r1').click(function () { $("#map_title").html("Job Opportunity"); });
+
+	    $('#r3').click(function () { $("#map_title").html("Salary"); });
+
+	    $('#r4').click(function () { $("#map_title").html("Unemployment Rate"); });
+
+
+
+	    $('#heatmap').change(function () {
+
+	        if (Number($('input[name=heatmap]:checked', '#heatmap').val()) == 3 && ($('#selectedOccupation').html() == '' || $('#selectedOccupation').html() == 'All Occupations')) { }
+
+	        else {
+
+	            $('#r2').click(function () { $("#map_title").html("Job Popularity"); });
+
+	            heatmaptype = $('input[name=heatmap]:checked', '#heatmap').attr('id');
+
+	            prepareFilter();
+
+	            heatmap = Number($('input[name=heatmap]:checked', '#heatmap').val());
+
+	            colorpicker();
+
+	            redrawMap();
+
+	            if (summary == true)
+
+	                drawSummary1();
+
+	            else
+
+	                drawSummary2();
+
+	        }
+
+	    }
+
+		);
+
+	    // We need a function here to add selected county through search bar or filter.
+
+	    // We need a function here to interact with favoriate list
+
+	});
+	colorpicker();
+	if (firstTime==0) {redrawMap();};
+	if (summary==true) 
+		drawSummary1();
+	else
+		drawSummary2();
+
+}
+function prepareSearch(){
+   var occ=$( "#autocomplete" ).val();
+   var flag=0;
+   for (var i=1; i<nation.length; i++){
+		if (nation[i].occ_title == occ)
+			{
+			 selectocc['occ_code1']=nation[i].occ_code1;
+			 selectocc['occ_code2']=nation[i].occ_code2;
+			 selectocc['occ_title']=occ;
+			 var tot_emp=nation[i].tot_emp;
+			 var a_mean=nation[i].a_mean;
+			 flag=1; 
+			}
+	}
+	if(flag===1)
+	{
+		smallcategory.length=0;
+		var selected=[];
+		for (var i=1; i<nation.length; i++){
+			if (selectocc['occ_code1'] == nation[i].occ_code1 && nation[i]['occ_code2']==0)
+				{
+				 selected['occ_code1']=selectocc['occ_code1'];
+				 selected['occ_code2']=0;
+				 selected['occ_title']=nation[i].occ_title;
+				 selected['a_mean']=nation[i].a_mean;
+				 selected['tot_emp']=nation[i].tot_emp;
+				 break;
+				}
+		}
+		smallcategory.push(selected);
+		for (var i=0;i<nation.length;i++){
+			if (nation[i]['occ_code1']==selected['occ_code1'] && nation[i]['occ_code2']%10 !=0)
+				smallcategory.push(nation[i]);
+		}
+	   if (occ!=-1){
+		$( "#selectedOccupation" ).html(occ);
+		for (var i=0;i<category.length;i++){
+			if (category[i]['occ_code1']==selected['occ_code1'])
+			{
+				$("#occupation").val(i.toString());
+				break;
+			}
+		} 
+		$("#occupation_small").css({display:"block"});
+		$("#occupation_small_label").css({display:"block"});
+		var opt2 = d3.selectAll("#occupation_small");
+		 opt2.on("change", prepareOccupation2)
+		 opt2.selectAll("option")
+			.remove()
+		 opt2.selectAll("option")
+			.data(smallcategory)
+			.enter()
+			.append("option")
+			.attr("value",function(d,i) {return i;}).text(function(d,i) {return d.occ_title;})
+		for (var i=0;i<smallcategory.length;i++){
+			console.log(smallcategory[i]['occ_title']);
+			console.log(smallcategory[i]['occ_title']==occ);
+			if (smallcategory[i]['occ_title']==occ)
+			{
+				$("#occupation_small").val(i.toString());
+				break;
+			}
+		}   
+ 
+		var j=1;
+		mapdata[0][2]=tot_emp;
+		mapdata[0][3]=1;
+		mapdata[0][4]=a_mean;
+		for(var i=0;i<state.length;i++){
+			if ((i+1)<state.length) {
+				if (state[i]['id']!==state[i+1]['id']){
+					j++;
+					mapdata[j][2]=null;
+					mapdata[j][3]=null;
+					mapdata[j][4]=null;
+				}
+				if (j==3) j++;
+				if (j==7) j++;
+			}
+			if( state[i]['id']==j && state[i]['occ_code1']==selectocc['occ_code1'])
+			{
+			 if (state[i]['occ_code2']==selectocc['occ_code2'])
+				{	
+					mapdata[j][2]=state[i]['tot_emp'];
+					mapdata[j][3]=state[i]['loc_q'];
+					mapdata[j][4]=state[i]['a_mean'];
+					if (j==56) break;
+				}
+			}
+		}	  	
+		}
+	   prepareFilter();
+	}
+	else {
+		alert(":( Sorry, we have not found such occupation in our database! Please choose another one.");
+		$( "#autocomplete" ).val("");
+	}
+}
+	
+// Prepare for all the data
+// including the corresponding values for each filters and the heatmap type.
+function prepareFilter(){
+	
+    
+    // figure out which state is selected, the index will be set
+    // to -1 if none are selected
+    var e = document.getElementById("statedropdown");
+ 	stateindex = e.options[e.selectedIndex].value;
+ 	if (stateindex==0)
+ 	{
+ 	 for(var i=1;i<mapdata.length;i++){
+ 			mapdata[i][5]=1;
+ 	}
+ 	}
+ 	else {
+ 	for(var i=1;i<mapdata.length;i++){
+ 		if (i!=stateindex)
+ 			mapdata[i][5]=0;
+ 		else mapdata[i][5]=1;
+ 		}
+ 		
+ 	}
+ 	if ($('#jobpopularity').val()!="Null"){
+				var popularity=[];
+				for(var i=1;i<mapdata.length;i++){
+					if(mapdata[i][3]!==null)
+						popularity.push(mapdata[i][3]);
+				}
+				popularity.sort(function(a,b){return a-b});
+				p25=popularity[Math.ceil((popularity.length)*0.25)-1];
+				p50=popularity[Math.ceil((popularity.length)*0.50)-1];
+				p75=popularity[Math.ceil((popularity.length)*0.75)-1];
+				if($('#jobpopularity').val()==="super"){
+					for(var i=1;i<mapdata.length;i++){
+						if(mapdata[i][3]<p75)
+							mapdata[i][5]=0;
+					}// for
+				} //if
+				if($('#jobpopularity').val()==="high"){
+					for(var i=1;i<mapdata.length;i++){
+						if(mapdata[i][3]>p75 || mapdata[i][3]<p50 )
+							mapdata[i][5]=0;
+					}// for
+				} //if
+				if($('#jobpopularity').val()==="medium"){
+					for(var i=1;i<mapdata.length;i++){
+						if(mapdata[i][3]>p50 || mapdata[i][3]<p25 )
+							mapdata[i][5]=0;
+					}// for
+				} //if
+				if($('#jobpopularity').val()==="low"){
+					for(var i=1;i<mapdata.length;i++){
+						if(mapdata[i][3]>p25)
+							mapdata[i][5]=0;
+					}// for
+				} //if
+	}
+	for(var i=1;i<mapdata.length;i++){
+			if (mapdata[i][4]< $( "#slider-range" ).slider( "values", 0 ) || mapdata[i][4]> $( "#slider-range" ).slider( "values", 1 )
+			|| mapdata[i][4]==null)
+				mapdata[i][5]=0;
+			}
+	colorpicker();
+	redrawMap();
+	if (summary==true) 
+		drawSummary1();
+	else
+		drawSummary2();
+}
+
+
+function prepareOccupation1(){
+ $( "#autocomplete" ).val("");
+ smallcategory.length=0;
+ var e1 = document.getElementById("occupation");
+ 	occupationindex = e1.options[e1.selectedIndex].value;
+ 	smallcategory.push(category[occupationindex]);
+	for (var i=0;i<nation.length;i++){
+    	if (nation[i]['occ_code1']==category[occupationindex]['occ_code1'] && nation[i]['occ_code2']%10 !=0)
+    		smallcategory.push(nation[i]);
+    }
+    selectocc=[];
+		selectocc['occ_code1']=category[occupationindex]['occ_code1'];
+		selectocc['occ_code2']=category[occupationindex]['occ_code2'];
+		selectocc['occ_title']=category[occupationindex]['occ_title'];
+		var j=1;
+		mapdata[0][2]=category[occupationindex]['tot_emp'];
+		mapdata[0][3]=1;
+		mapdata[0][4]=category[occupationindex]['a_mean'];
+		for(var i=0;i<state.length;i++){
+			if ((i+1)<state.length) {
+				if (state[i]['id']!==state[i+1]['id']){
+					j++;
+					mapdata[j][2]=null;
+					mapdata[j][3]=null;
+					mapdata[j][4]=null;
+				}
+				if (j==3) j++;
+				if (j==7) j++;
+			}
+			if( state[i]['id']==j && state[i]['occ_code1']==category[occupationindex]['occ_code1'])
+			{
+			 if (state[i]['occ_code2']==category[occupationindex]['occ_code2'])
+				{	
+					mapdata[j][2]=state[i]['tot_emp'];
+					mapdata[j][3]=state[i]['loc_q'];
+					mapdata[j][4]=state[i]['a_mean'];
+					if (j==56) break;
+				}
+			}
+	}
+     $("#occupation_small").css({display:"block"});
+     $("#occupation_small_label").css({display:"block"});
+     var opt2 = d3.selectAll("#occupation_small");
+     opt2.on("change", prepareOccupation2)
+     opt2.selectAll("option")
+     	.remove()
+     opt2.selectAll("option")
+     	.data(smallcategory)
+     	.enter()
+     	.append("option")
+     	.attr("value",function(d,i) {return i;}).text(function(d,i) {return d.occ_title;})
+   if (occupationindex ==0)
+    {
+    $("#occupation_small").css({display:"none"});
+    $("#occupation_small_label").css({display:"none"});	 
+    }
+    $( "#selectedOccupation" ).html(selectocc['occ_title']);
+       prepareFilter();
+    colorpicker();
+	redrawMap();
+	if (summary==true) 
+		drawSummary1();
+	else
+		drawSummary2();
+}
+
+function prepareOccupation2(){
+	var e1 = document.getElementById("occupation_small");
+		occupationindex = e1.options[e1.selectedIndex].value;
+	selectocc=[];
+	selectocc['occ_code1']=smallcategory[occupationindex]['occ_code1'];
+	selectocc['occ_code2']=smallcategory[occupationindex]['occ_code2'];
+	selectocc['occ_title']=smallcategory[occupationindex]['occ_title'];
+   	$( "#selectedOccupation" ).html(selectocc['occ_title']);
+	var j=1;
+	mapdata[0][2]=smallcategory[occupationindex]['tot_emp'];
+	mapdata[0][3]=1;
+	mapdata[0][4]=smallcategory[occupationindex]['a_mean'];
+	for(var i=0;i<state.length;i++){
+		if ((i+1)<state.length) {
+			if (state[i]['id']!==state[i+1]['id']){
+				j++;
+				mapdata[j][2]=null;
+				mapdata[j][3]=null;
+				mapdata[j][4]=null;
+			}
+			if (j==3) j++;
+			if (j==7) j++;
+		}
+		if( state[i]['id']==j && state[i]['occ_code1']==smallcategory[occupationindex]['occ_code1'])
+		{
+		 if (state[i]['occ_code2']==smallcategory[occupationindex]['occ_code2'])
+			{	
+				mapdata[j][2]=state[i]['tot_emp'];
+				mapdata[j][3]=state[i]['loc_q'];
+				mapdata[j][4]=state[i]['a_mean'];
+				if (j==56) break;
+			}
+		}
+	}
+	prepareFilter();
+	colorpicker();
+	redrawMap();
+	if (summary==true) 
+		drawSummary1();
+	else
+		drawSummary2();
+}
+
+// Draw Map
+// This function is also responsible for change the color when users choose different style heatmap
+// and gray some states according to the filter.
+// When writing this function that may require to pass in the selected filter and the selected heatmap type.
+function drawMap()
+{
+	firstTime=0;
+	//define canvas weight and height
+
+  d3.select("#map").selectAll("svg").remove();
+  var width = 800,
+      height = 600;
+
+  //define projection method
+  var projection = d3.geo.albersUsa().scale(1070).translate([width / 2, height / 2]);
+
+  //using projection mehtod into path
+  var path = d3.geo.path().projection(projection);
+
+  //append svg to canvas
+  var svg = d3.select("#map")
+              .append("svg")
+              .attr("width", width)
+              .attr("height", height);
+
+  //generate an flag array for each state to flag whether it is selected or not
+  selectflag=new Array(57);
+  for(var i=0;i<selectflag.length;i++) selectflag[i]=0;
+
+  //initiate compare list
+  var comparecount=0;
+  //append a rectangle background to the svg
+  svg.append("rect")
+      .attr("class", "background")
+      .attr("width", width)
+      .attr("height", height);
+
+  //append the map graph to svg
+  var g = svg.append("g");
+
+  //initiate state names array
+  var statename=[];
+
+  //read statename from json and copy it to the array statename
+   // Guiting Change referrence
+  d3.json("Data/statename.json", function(error,data)
+  {
+    if (error) 
+      {
+        throw error;
+      }
+    statename=data.slice();
+  })
+
+  //append a div tooltip to canvas and set it hidden
+  var tooltip = d3.select("#map")
+                  .append("div")
+                  .style("position", "absolute")
+                  .style("z-index", "10")
+                  .style("visibility", "hidden")
+                  .attr("class","tooltip");
+
+  //read map geo data from json and draw it on map
+  d3.json("Data/us.json", function(error, us) {
+     mappic=g.append("g")
+      .attr("id", "states")
+      .selectAll("path")
+      .data(topojson.feature(us, us.objects.states).features)
+      .enter()
+      .append("path")
+      .attr("d", path)
+      .attr("fill",function(d){return mapcolor[d.id];})
+      .attr("class",function(d){     // Guiting Change
+      if (typeof(statename[d.id-1])== 'undefined') 
+      	return ('aaa');
+      else return (statename[d.id-1].name.substr(0,3)+d.id.toString()+'1');})
+       // Guiting Change end
+       
+      //when click one state, its id will be
+      .on("click", function(d){ 
+          if (selectflag[d.id-1]==0) 
+          {
+          	if (mapdata[d.id][5]==0) {alert("This state can't be selected because it has been filtered.");}
+            else if(comparecount<5)
+            {
+              //change selected state's color and selectflag, push its id into compare list
+              // d3.select(this).attr("fill","#fef16f");
+              d3.select(this).attr("stroke-width","3px").attr("stroke",strokecolor);
+              comparelist[comparecount]=d.id;
+               // Guiting Change
+              if (summary==true) {drawSummary2();change();}
+              	else drawSummary2();
+              comparecount++;
+              selectflag[d.id-1]=1;
+              addfavorite();
+               // Guiting Change end
+            }
+            else
+            {
+              //when there are already 5 states selected, the code will alert
+              // console.log("already 5 selections in compare list")
+              alert("There are 5 selections at most in compare list")
+            }
+          }
+          else 
+          {
+            //unselect the state and delete its id from compare list
+            // d3.select(this).attr("fill",mapcolor[d.id]);
+            d3.select(this).attr("stroke-width","0px");
+            deleteid(comparelist,d.id);
+            selectflag[d.id-1]=0;
+            comparecount--;
+            // Guiting Change
+            addfavorite();
+            console.log("add");
+            if (comparecount>0)
+				if (summary==true) {drawSummary2();change();}
+					else drawSummary2();
+			else
+				change();
+          }
+           // Guiting Change end
+          })
+      .on("mouseover",function(d){
+          
+              //hover effect
+              d3.select(this).attr("opacity","0.9");
+               // Guiting Change	  		
+              d3.select("."+statename[d.id-1].name.substr(0,3)+d.id.toString()+'2').style("stroke", "black").style("stroke-width", 2)
+               // Guiting Change end 
+          
+          //generate tooltip text with color to indicate comparision with average national level
+           txt="<p class='title'>"+mapdata[d.id][0]+
+            "</p><p>Job opportunity: <span class=";
+            if(mapdata[d.id][2]>=pmedian[1]) txt+="greenfont>";
+            else txt+="redfont>";
+            txt+=commafy(mapdata[d.id][2])+
+            "</span></p><p>Job popularity: <span class="
+            if(mapdata[d.id][3]>=pmedian[2]) txt+="greenfont>";
+            else txt+="redfont>";
+            txt+=commafy(mapdata[d.id][3])+
+            "</span></p><p>Salary: <span class=";
+            if(mapdata[d.id][4]>=pmedian[3]) txt+="greenfont>";
+            else txt+="redfont>";
+            if (mapdata[d.id][4]!=null) {txt+="$";}
+            txt+=commafy(mapdata[d.id][4])+
+            "</span></p><p>Unemployment: <span class=";
+            if(mapdata[d.id][1]<=pmedian[0]) {txt+="greenfont>";}
+            else {txt+="redfont>";}
+            txt+=commafy(mapdata[d.id][1])+"%"+"</span></p>";
+          
+          //show the tooltip  
+          tooltip.html(txt);
+          tooltip.style("visibility", "visible");
+        })
+	  //set the tooltip box move with mouse
+      .on("mousemove",
+      	  function(){return tooltip.style("top", (event.pageY+10)+"px").style("left",(event.pageX+20)+"px");})
+      .on("mouseout",function(d){
+      	d3.select(this).attr("opacity","1");
+            
+               // Guiting Change
+              d3.select("."+statename[d.id-1].name.substr(0,3)+d.id.toString()+'2').style("stroke", "white").style("stroke-width", 0.3)
+               // Guiting Change end
+          
+          //hide the tooltip
+          tooltip.style("visibility","hidden");
+        });
+
+     var starpath="M 680.000 274.000 L 684.702 276.472 L 683.804 271.236 L 687.608 267.528 L 682.351 266.764 L 680.000 262.000 L 677.649 266.764 L 672.392 267.528 L 676.196 271.236 L 675.298 276.472 L 680.000 274.000";
+      star =svg.append("path")
+            .attr('d',starpath)
+		   .attr("fill",mapcolor[10])
+		   .attr("stroke","white")
+		   .attr("stroke-width","2px")
+		  .attr("class",function(d){     // Guiting Change
+  			return (statename[10].name.substr(0,3)+10+'1');})
+		   .on("click", function(){ 
+          if (selectflag[10]==0) 
+          {
+          	if (mapdata[11][5]==0) {alert("This state can't be selected because it has been filtered.");}
+            else if(comparecount<5)
+            {
+              //change selected state's color and selectflag, push its id into compare list
+              // d3.select(this).attr("fill","#fef16f");
+              d3.select(this).attr("stroke-width","3px").attr("stroke",strokecolor);
+              comparelist[comparecount]=11;
+              comparecount++;
+              selectflag[10]=1;
+              // Guiting Change
+              if (summary==true) {drawSummary2();change();}
+              	else drawSummary2();
+              addfavorite();
+               // Guiting Change end
+              console.log(selectflag);
+            }
+            else
+            {
+              //when there are already 5 states selected, the code will alert
+              console.log("already 5 selections in compare list")
+              alert("already 5 selections in compare list")
+            }
+          }
+          else 
+          {
+            //unselect the state and delete its id from compare list
+			d3.select(this).attr("stroke-width","0px");
+            deleteid(comparelist,11);
+            selectflag[10]=0;
+            comparecount--;
+        // Guiting Change
+            addfavorite();
+            console.log("add");
+            if (comparecount>0)
+				if (summary==true) {drawSummary2();change();}
+					else drawSummary2();
+			else{
+				drawSummary2();
+				change();
+			}
+          }
+           // Guiting Change end
+          })
+      .on("mouseover",function(d){
+          
+              //hover effect
+              d3.select(this).attr("opacity","0.9");
+              console.log("."+statename[10].name+'2');
+           	  d3.select("."+statename[10].name.substr(0,3)+'112').style("stroke", "black").style("stroke-width", 2)
+          //generate tooltip text with color to indicate comparision with average national level
+           txt="<p class='title'>"+mapdata[11][0]+
+            "</p><p>Job opportunity: <span class=";
+            if(mapdata[11][2]>=pmedian[1]) txt+="greenfont>";
+            else txt+="redfont>";
+            txt+=commafy(mapdata[11][2])+
+            "</span></p><p>Job popularity: <span class="
+            if(mapdata[11][3]>=pmedian[2]) txt+="greenfont>";
+            else txt+="redfont>";
+            txt+=commafy(mapdata[11][3])+
+            "</span></p><p>Salary: <span class=";
+            if(mapdata[11][4]>=pmedian[3]) txt+="greenfont>";
+            else txt+="redfont>";
+            txt+="$"+commafy(mapdata[11][4])+
+            "</span></p><p>Unemployment: <span class=";
+            if(mapdata[11][1]<=pmedian[0]) {txt+="greenfont>";}
+            else {txt+="redfont>";}
+            txt+=commafy(mapdata[11][1])+"%"+"</span></p>";
+          
+          //show the tooltip  
+          tooltip.html(txt);
+          tooltip.style("visibility", "visible");
+        })
+	  //set the tooltip box move with mouse
+      .on("mousemove",
+      	  function(){return tooltip.style("top", (event.pageY+10)+"px").style("left",(event.pageX+20)+"px");})
+      .on("mouseout",function(d){
+         
+              d3.select(this).attr("opacity","1");
+               d3.select("."+statename[10].name.substr(0,3)+'112').style("stroke", "white").style("stroke-width", 0.3)
+          
+          //hide the tooltip
+          tooltip.style("visibility","hidden");
+        });
+
+     g.append("path")
+      .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+      .attr("id", "state-borders")
+      .attr("d", path);
+
+
+      //create lengends
+      legendstart=[685,380];
+      
+
+      legend1=svg.append("rect")
+      .attr("x",legendstart[0])
+      .attr("y",legendstart[1])
+      .attr("width",10)
+      .attr("height",10)
+      .attr("fill",colorpalette[heatmap][0]);
+      legend2=svg.append("rect")
+      .attr("x",legendstart[0])
+      .attr("y",legendstart[1]+25)
+      .attr("width",10)
+      .attr("height",10)
+      .attr("fill",colorpalette[heatmap][1]);
+      legend3=svg.append("rect")
+      .attr("x",legendstart[0])
+      .attr("y",legendstart[1]+50)
+      .attr("width",10)
+      .attr("height",10)
+      .attr("fill",colorpalette[heatmap][2]);
+      legend4=svg.append("rect")
+      .attr("x",legendstart[0])
+      .attr("y",legendstart[1]+75)
+      .attr("width",10)
+      .attr("height",10)
+      .attr("fill",colorpalette[heatmap][3]);
+      legend5=svg.append("rect")
+      .attr("x",legendstart[0])
+      .attr("y",legendstart[1]+100)
+      .attr("width",10)
+      .attr("height",10)
+      .attr("fill",colorpalette[heatmap][4]);
+      legendtext1=svg.append("text").text(txt1)
+      .attr("x",legendstart[0]+20)
+      .attr("y",legendstart[1]+7)
+      .attr("font-size",9)
+      .attr("fill",colorpalette[heatmap][0]);
+      legendtext2=svg.append("text").text(txt2)
+      .attr("x",legendstart[0]+20)
+      .attr("y",legendstart[1]+32)
+      .attr("font-size",9)
+      .attr("fill",colorpalette[heatmap][0]);
+      legendtext3=svg.append("text").text(txt3)
+      .attr("x",legendstart[0]+20)
+      .attr("y",legendstart[1]+57)
+      .attr("font-size",9)
+      .attr("fill",colorpalette[heatmap][0]);
+      legendtext4=svg.append("text").text(txt4)
+      .attr("x",legendstart[0]+20)
+      .attr("y",legendstart[1]+82)
+      .attr("font-size",9)
+      .attr("fill",colorpalette[heatmap][0]);
+      legendtext5=svg.append("text").text(txt5)
+      .attr("x",legendstart[0]+20)
+      .attr("y",legendstart[1]+107)
+      .attr("font-size",9)
+      .attr("fill",colorpalette[heatmap][0]);
+  });
+}
+
+function redrawMap()
+{
+  //read map geo data from json and draw it on map
+  mappic.transition().duration(600).attr("fill",function(d){ return mapcolor[d.id];});
+  star.transition().duration(600).attr("fill",function(){ return mapcolor[11];});
+  legend1.transition().duration(600).attr("fill",colorpalette[heatmap][0]);
+  legendtext1.text(txt1).transition().duration(600).attr("fill",colorpalette[heatmap][0]);
+  legend2.transition().duration(600).attr("fill",colorpalette[heatmap][1]);
+  legendtext2.text(txt2).transition().duration(600).attr("fill",colorpalette[heatmap][1]);
+  legend3.transition().duration(600).attr("fill",colorpalette[heatmap][2]);
+  legendtext3.text(txt3).transition().duration(600).attr("fill",colorpalette[heatmap][2]);
+  legend4.transition().duration(600).attr("fill",colorpalette[heatmap][3]);
+  legendtext4.text(txt4).transition().duration(600).attr("fill",colorpalette[heatmap][3]);
+  legend5.transition().duration(600).attr("fill",colorpalette[heatmap][4]);
+  legendtext5.text(txt5).transition().duration(600).attr("fill",colorpalette[heatmap][4]);
+}
+
+
+
+//function deletid(arr,num): Delete the number equal to num from the array arr
+function deleteid(arr,num)
+{
+  for(var i=0;i<arr.length;i++)
+  {
+    if(arr[i]==num)
+    {
+      arr.splice(i,1);
+    }
+  }
+}
+
+function colorpicker()
+{
+	//get 1/5 point to decide color of each state
+	for(var i=0;i<mapdata.length;i++)
+	{
+		// console.log(mapdata[i][heatmap]);
+		sortdata[i]=mapdata[i][heatmap];
+	}
+	// console.log(heatmap);
+	// console.log(mapdata);
+	// console.log(sortdata);
+	tmpsort=sortdata.slice();
+	tmpsort.sort(function(a,b){return b-a});
+	for(count=0;count<tmpsort.length;count++)
+	{
+		if (tmpsort[count]==null) break;
+	}
+
+	console.log(sortdata);
+	p20=tmpsort[Math.ceil((count-1)*0.2)];
+	p40=tmpsort[Math.ceil((count-1)*0.4)];
+	p60=tmpsort[Math.ceil((count-1)*0.6)];
+	p80=tmpsort[Math.ceil((count-1)*0.8)];
+	p0=tmpsort[1];
+	console.log(p20+" "+p40+" "+p60+" "+p80+" "+p0);
+	txt1=""+commafy(p20)+" ~ "+commafy(p0);
+  	txt2=""+commafy(p40)+" ~ "+commafy(p20);
+  	txt3=""+commafy(p60)+" ~ "+commafy(p40);
+  	txt4=""+commafy(p80)+" ~ "+commafy(p60);
+  	txt5=""+0+" ~ "+commafy(p80);
+	
+  	if (heatmap==1) {
+  		txt1+="%";txt2+="%";txt3+="%";txt4+="%";txt5+="%";
+  	}
+  	if (heatmap==4) {
+  		txt1="$ "+txt1;txt2="$ "+txt2;txt3="$ "+txt3;txt4="$ "+txt4;txt5="$ "+txt5;
+  	}
+
+	//assign color values to different states based on sort data chosen
+	for(var i=0;i<sortdata.length;i++)
+	{
+		if (mapdata[i][5]==0)
+			mapcolor[i]="#e6e7e8";
+		else if (sortdata[i]>p20)
+			mapcolor[i]=colorpalette[heatmap][0];
+		else if(sortdata[i]>p40)
+			mapcolor[i]=colorpalette[heatmap][1];
+		else if(sortdata[i]>p60)
+			mapcolor[i]=colorpalette[heatmap][2];
+		else if(sortdata[i]>p80)
+			mapcolor[i]=colorpalette[heatmap][3];
+		else
+			mapcolor[i]=colorpalette[heatmap][4];
+	}
+
+	tmpmed=[[],[],[],[],[]];
+	pmedian=[];
+	for(var i=1;i<5;i++)
+	{
+		for(var j=1;j<mapdata.length;j++)
+		{
+			tmpmed[i].push(mapdata[j][i]);
+		}
+
+		tmpmed[i].sort(function(a,b){return b-a});
+		// console.log(tmpmed[i]);
+		var tmp=tmpmed[i][Math.ceil((tmpmed[i].length)*0.5)-1];
+		// console.log(Math.ceil((tmpmed[i].length)*0.5)-1);
+		pmedian.push(tmp);
+	}
+}
+
+
+summary = true  // identify which chart to show. if true, show summary chart, otherwise show compare chart
+// The function change the status between summary chart and compare chart, and create transition effects
+function change(){	
+	if (summary==true){
+		d3.select("#chart2").select("svg").attr("width",0)
+ 		d3.select("#chart2").select("svg").selectAll("g").select("rect#empbar").attr("y", ch*0.75+30).attr("height", 0)
+ 		d3.select("#chart2").select("svg").selectAll("g").select("rect#wagebar").attr("y", ch*0.75+30).attr("height", 0)
+ 		d3.select("#chart2").select("svg").selectAll("g").select("rect#locbar").attr("y", ch*0.75+30).attr("height", 0)
+ 		d3.select("#chart2").select("svg").selectAll("g").select("rect#unempbar").attr("y", ch*0.75+30).attr("height", 0)
+ 		d3.select("#chart2").select("svg").select("rect#avgempbar").attr("y", ch*0.75+30).attr("height", 0)
+ 		d3.select("#chart2").select("svg").select("rect#avgwagebar").attr("y", ch*0.75+30).attr("height", 0)
+ 		d3.select("#chart2").select("svg").select("rect#avglocbar").attr("y", ch*0.75+30).attr("height", 0)
+ 		d3.select("#chart2").select("svg").select("rect#avgunempbar").attr("y", ch*0.75+30).attr("height", 0)
+ 		
+		d3.select("#chart1").select("svg").transition().duration(1900).attr("width",0)
+		d3.select("#chart1").select("svg").selectAll("g").select("rect#bar").data(occ).transition().delay(2000)
+		  .attr("y", ch*0.75+20)
+		  .attr("height", 0)	
+		  	
+		d3.select("#chart2").select("svg").transition().delay(500).duration(5000).attr("width",cw)
+		
+ 		d3.select("#chart2").select("svg").selectAll("g").select("rect#empbar").data(compareState).transition().delay(1000).duration(3000)
+ 	      .attr("y", function(d) { return ((empMinMax[1]-d.tot_emp)/(empMinMax[1]-0)*ch*0.75+30); })
+ 	      .attr("height", function(d) { return ((d.tot_emp-0)/(empMinMax[1]-0)*ch*0.75); })
+ 		d3.select("#chart2").select("svg").select("rect#avgempbar").transition().delay(1000).duration(3000)
+ 	      .attr("y", ((empMinMax[1]-empAvg)/(empMinMax[1]-0)*ch*0.75+30))
+ 	      .attr("height", ((empAvg-0)/(empMinMax[1]-0)*ch*0.75))
+	      
+ 		d3.select("#chart2").select("svg").selectAll("g").select("rect#wagebar").data(compareState).transition().delay(2000).duration(3000)
+ 	      .attr("y", function(d) { return ((wageMinMax[1]-d.wage)/(wageMinMax[1]-0)*ch*0.75+30); }) 	     	    
+ 	      .attr("height", function(d) { return ((d.wage-0)/(wageMinMax[1]-0)*ch*0.75); })
+ 		d3.select("#chart2").select("svg").select("rect#avgwagebar").transition().delay(2000).duration(3000)
+ 	      .attr("y", ((wageMinMax[1]-wageAvg)/(wageMinMax[1]-0)*ch*0.75+30))
+ 	      .attr("height", ((wageAvg-0)/(wageMinMax[1]-0)*ch*0.75))
+	       	      
+ 		d3.select("#chart2").select("svg").selectAll("g").select("rect#locbar").data(compareState).transition().delay(3000).duration(3000)
+ 	      .attr("y", function(d) { return ((locMinMax[1]-d.loc_q)/(locMinMax[1]-0)*ch*0.75+30); }) 	     	    
+ 	      .attr("height", function(d) { return ((d.loc_q-0)/(locMinMax[1]-0)*ch*0.75); })
+ 		d3.select("#chart2").select("svg").select("rect#avglocbar").transition().delay(3000).duration(3000)
+ 	      .attr("y", ((locMinMax[1]-locAvg)/(locMinMax[1]-0)*ch*0.75+30)) 	     	    
+ 	      .attr("height", ((locAvg-0)/(locMinMax[1]-0)*ch*0.75))	     	    
+
+ 		d3.select("#chart2").select("svg").selectAll("g").select("rect#unempbar").data(compareState).transition().delay(3500).duration(3000)
+ 	      .attr("y", function(d) { return ((unempMinMax[1]-d.unemployment)/(unempMinMax[1]-0)*ch*0.75+30); }) 	     	    
+ 	      .attr("height", function(d) { return ((d.unemployment-0)/(unempMinMax[1]-0)*ch*0.75); })
+ 		d3.select("#chart2").select("svg").select("rect#avgunempbar").transition().delay(3500).duration(3000)
+ 	      .attr("y", ((unempMinMax[1]-unempAvg)/(unempMinMax[1]-0)*ch*0.75+30)) 	     	    
+ 	      .attr("height", ((unempAvg-0)/(unempMinMax[1]-0)*ch*0.75))
+ 	      	      
+		summary = false	
+	}
+	else{
+		d3.select("#chart2").select("svg").transition().duration(2000).attr("width",0)
+ 		d3.select("#chart2").select("svg").selectAll("g").select("rect#empbar").transition().delay(2000).attr("y", ch*0.75+30).attr("height", 0)
+ 		d3.select("#chart2").select("svg").selectAll("g").select("rect#wagebar").transition().delay(2000).attr("y", ch*0.75+30).attr("height", 0)
+ 		d3.select("#chart2").select("svg").selectAll("g").select("rect#locbar").transition().delay(2000).attr("y", ch*0.75+30).attr("height", 0)
+ 		d3.select("#chart2").select("svg").selectAll("g").select("rect#unempbar").transition().delay(2000).attr("y", ch*0.75+30).attr("height", 0)
+ 		d3.select("#chart2").select("svg").select("rect#avgempbar").transition().delay(2000).attr("y", ch*0.75+30).attr("height", 0)
+ 		d3.select("#chart2").select("svg").select("rect#avgwagebar").transition().delay(2000).attr("y", ch*0.75+30).attr("height", 0)
+ 		d3.select("#chart2").select("svg").select("rect#avglocbar").transition().delay(2000).attr("y", ch*0.75+30).attr("height", 0)
+ 		d3.select("#chart2").select("svg").select("rect#avgunempbar").transition().delay(2000).attr("y", ch*0.75+30).attr("height", 0)
+ 		 		 	      
+		d3.select("#chart1").select("svg").transition().delay(1000).duration(3000).attr("width",cw)
+		d3.select("#chart1").select("svg").selectAll("g").select("rect#bar").data(occ).transition().delay(3000).duration(2000)
+		  .attr("y", function(d) { return ((occMinMax[1]-d.choice)/(occMinMax[1]-0)*ch*0.75+20); })
+		  .attr("height", function(d) { return ((d.choice-0)/(occMinMax[1]-0)*ch*0.75); })
+		
+		summary = true
+	}
+}
+
+// the function used to calculate the minimum and maximum
+function calcMinMax(inputArray, variable) {
+        
+     var max = -Number.MAX_VALUE;
+	 var min = Number.MAX_VALUE;
+	 
+     for (idx in inputArray){
+    	if (inputArray[idx][variable] < min){
+    		min=inputArray[idx][variable];
+    	}
+    	if (inputArray[idx][variable] > max){
+    		max=inputArray[idx][variable];
+    	}     	    
+     }     
+     return ([min,max]);
+}
+
+
+ch = 300;   //define the height of summary chart
+cw = 1100;   //define the width of summary chart
+barW = Math.round((cw-100)/52,2) //define the width of each bar
+// This function is used to draw the summary chart.
+function drawSummary1(){
+
+	d3.select("#chart1").select("svg")
+    .remove();
+	
+	// assign the value of the heatmap option to variable choice   
+	radioSelected = document.forms[0]["heatmap"];
+	for (i = 0 ; i < radioSelected.length ; i++) {
+		if (radioSelected[i].checked) {
+			choice = radioSelected[i].value;
+		}
+	}
+	
+	if(choice == "1"){
+		index = 1
+		yTitle = 'Unemployment Rate(%)'
+	}else if (choice == "2"){
+		index = 2
+		yTitle = 'Job Opportunity'
+	}else if (choice == "3"){
+		index = 3
+		yTitle = 'Job Popularity'
+	}else if (choice == "4"){
+		index = 4
+		yTitle = 'Annual Mean Salary($)'
+	}
+
+	// occ puts the state name and the corresponding heatmap option value
+	occ = []     			
+	for (var i = 1; i < mapdata.length; i++){
+		if (mapdata[i][index] > 0 && i != 14 && i != 52)
+			occ.push({state:mapdata[i][0], choice:mapdata[i][index],id:i,st:unemployment[i]['st']})
+	}
+	
+	// sort the occ array in descending order
+	occ.sort(function(a,b) {
+		if (a.choice > b.choice)
+  			return -1;
+		if (a.choice < b.choice)
+  			return 1;
+		return 0;
+	});
+  	
+    occMinMax = calcMinMax(occ, "choice"); 
+
+//draw summary chart	  		  	
+	var w=cw,h=ch;
+
+	var svg=d3.select("#chart1") 
+        .append("svg") 
+    	.attr("width",w).attr("height",h); 
+    	
+	var barchart = svg.selectAll("g")
+		.data(occ)
+		.enter()
+		.append("g");
+	var bar = svg.selectAll("g")
+	    .data(occ)
+	    .append("rect")
+        .attr("x", function(d,i) { return (i*barW+70); })
+	    .attr("y", ch*0.75+20)
+	    .attr("width", barW-2)
+	    .attr("height", 0)
+	    .attr("fill", function(d){return mapcolor[d.id];})
+	    .attr("stroke", "white")
+	    .attr("stroke-width", 0.3)
+		.attr("id", "bar")
+		.attr("class",function(d){ return d.state.substr(0,3)+d.id+'2';})
+		.on("mouseover", function(d,i){
+		    d3.select("."+d.state.substr(0,3)+d.id+'1').attr("opacity","0.6");
+	  		d3.select(this).style("stroke", "black").style("stroke-width", 2)
+  	  		svg.append("rect").attr("x", (i*barW+55)).attr("y", (occMinMax[1]-d.choice)/(occMinMax[1]-0)*ch*0.75)
+  	  		   .attr("width", 55).attr("height", 17.5).attr("fill", "grey").attr("id", "barRect") 	  		
+ 	  		svg.append("text").attr("x", (i*barW+60)).attr("y", (occMinMax[1]-d.choice)/(occMinMax[1]-0)*ch*0.75+12.5)
+ 	  		   .text(d.choice).attr("fill", "white").style("font-size", "12px").attr("id", "barValue")    
+		})
+ 		.on("mouseout", function(d){
+ 			d3.select("."+d.state.substr(0,3)+d.id+'1').attr("opacity","1");
+ 			d3.select(this).style("stroke", "white").style("stroke-width", 0.3)
+ 			d3.select("rect#" + "barRect").remove()
+ 			d3.select("text#" + "barValue").remove()
+		});
+	
+	// transition effect
+	d3.select("#chart1").select("svg").selectAll("g").select("rect#bar").data(occ).transition().duration(2000)
+	  .attr("y", function(d) { return ((occMinMax[1]-d.choice)/(occMinMax[1]-0)*ch*0.75+20); })
+	  .attr("height", function(d) { return ((d.choice-0)/(occMinMax[1]-0)*ch*0.75); })
+	
+	// text of x-axis
+	var text = svg.selectAll("g")
+	   .data(occ)
+	   .append("text")
+	   .attr("x", function(d,i) { return (i*barW+72); })
+	   .attr("y", ch*0.75+30)
+	   .style("font-size", "10px")
+	   .style("font-weight", "bold")
+	   .text(function(d) { return d.st; })
+	   .attr("fill", "white")
+	   .attr("transform", function(d,i) {return "rotate(0 "+ (i*barW+75) +","+ (ch*0.75+30) +")" });
+	
+	// text of y-axis
+	var text = svg
+	   .append("text")
+	   .attr("x", 0)
+	   .attr("y", 10)
+	   .style("font-size", "12px")
+	   .style("font-weight", "bold")
+	   .text(yTitle)
+	   .attr("fill", "white")	
+	   	   
+	//  ADD THE AXIS	  
+	var xaxisScale = d3.scale.linear()
+		.domain([])
+   		.range([0,cw-100]);
+  
+	var xAxis = d3.svg.axis()
+   		.scale(xaxisScale)
+    
+	var xAxisGroup = svg.append("g")
+  	 	.attr("class", "x axis")
+   		.attr("transform", "translate(70,"+ (ch*0.75+20) +")")
+   		.call(xAxis)
+   
+	var yaxisScale = d3.scale.linear()
+   		.domain([occMinMax[1],0])
+   		.range([0,ch*0.75]);
+  
+	var yAxis = d3.svg.axis()
+   		.scale(yaxisScale)
+   		.orient("left");
+  
+	var yAxisGroup = svg.append("g")
+   		.attr("class", "y axis")
+   		.attr("transform", "translate(70,20)")
+   		.call(yAxis);
+}
+
+
+// define the width of compare chart
+compareW = (cw-100)/4-50
+compareBarW = (compareW-30)/6
+// The function is used to draw four compare charts
+function drawSummary2(){
+	d3.select("#chart2").select("svg")
+    .remove();
+	
+	// temporary!!! should be assigned the id of states that need be compared
+	compareList = comparelist; 
+// 	if (compareList.length==0) 
+// 		change();
+	
+	// temporary!!! should be assigned the occupation code.  be used to find the national average value of the chosen occupation in 'nation' array
+	occ_code1 =selectocc['occ_code1']
+	occ_code2 =selectocc['occ_code2']
+	
+	// compareState array is used to put the value of chosen states
+	compareState = []
+	for (var j=0; j<compareList.length; j++){
+		compareState.push({id:compareList[j],st:unemployment[compareList[j]]['st'], state:mapdata[compareList[j]][0], unemployment:mapdata[compareList[j]][1], wage:mapdata[compareList[j]][4], loc_q:mapdata[compareList[j]][3], tot_emp:mapdata[compareList[j]][2]});
+	}
+
+	// find the national average value of the chosen occupation in 'nation' array
+	for (var i=0; i<nation.length; i++){
+		if (nation[i].occ_code1 == occ_code1 && nation[i].occ_code2 == occ_code2){
+			empAvg = Math.round(nation[i].tot_emp/54);
+			wageAvg = nation[i].a_mean;
+			locAvg = 1;
+			break;
+		}
+	}
+	unempAvg = unemployment[0].rate;
+	
+	// compareNation array is used to put the value of chosen states and the average value of nation. This array is used to draw four compare charts	
+	compareNation = []
+	for (var i = 0; i < compareState.length; i++){
+		compareNation.push(compareState[i]);
+	}
+	compareNation.push({state:"Average", st: "US", unemployment:unempAvg, wage:wageAvg, loc_q:locAvg, tot_emp:empAvg});
+	
+	// find the minimum and maximum of wage, loc_q, number of employment, unemployment rate  	
+    wageMinMax = calcMinMax(compareNation,"wage"); 
+    locMinMax = calcMinMax(compareNation,"loc_q");
+    empMinMax = calcMinMax(compareNation,"tot_emp");
+    unempMinMax = calcMinMax(compareNation,"unemployment");
+    
+    // this variable is used to place four compare charts
+    position = 90+30*(5-compareList.length)
+
+
+	// start drawing compare charts
+	var h=ch;
+	if (summary==true) 
+		var w=0;
+	else
+		var w=cw;
+	
+	var svg=d3.select("#chart2") 
+        .append("svg") 
+    	.attr("width",w).attr("height",h); 
+    	
+	var barchart = svg.selectAll("g")
+		.data(compareState)
+		.enter()
+		.append("g");
+
+//draw number of employment chart
+	var empBar = svg.selectAll("g")
+	   .data(compareState)
+	   .append("rect")
+	   .attr("x", function(d,i) { return (100+(compareW+50)*0+5+(5+compareBarW)*(i+1)); })
+	   .attr("y", ch*0.75+30)
+	   .attr("width", compareBarW)
+	   .attr("height", 0)
+	   .attr("fill", function(d){return mapcolor[d.id];})
+	   .attr("stroke", "white")
+	   .attr("stroke-width", 0.5)
+	   .attr("id", "empbar")
+	   .on("mouseover", function(d,i){
+	  		d3.select(this).style("stroke", "black").style("stroke-width", 2)
+  	  		svg.append("rect").attr("x", 100+(compareW+50)*0+5+(5+compareBarW)*(i+1)-10).attr("y", (empMinMax[1]-d.tot_emp)/(empMinMax[1]-0)*ch*0.75+7.5)
+  	  		   .attr("width", 50).attr("height", 20).attr("fill", "grey").attr("id", "empBarRect")	  		
+  	  		svg.append("text").attr("x", 100+(compareW+50)*0+5+(5+compareBarW)*(i+1)-5).attr("y", (empMinMax[1]-d.tot_emp)/(empMinMax[1]-0)*ch*0.75+20)
+  	  		   .text(d.tot_emp).attr("fill", "white").style("font-size", "12px").attr("id", "empBarValue") 
+		})
+ 	   .on("mouseout", function(d){
+ 			d3.select(this).style("stroke", "white").style("stroke-width", 0.5)
+ 			d3.select("rect#" + "empBarRect").remove()
+  			d3.select("text#" + "empBarValue").remove()
+		});
+	
+	// transition effect
+	d3.select("#chart2").select("svg").selectAll("g").select("rect#empbar").data(compareState).transition().duration(2000)
+ 	  .attr("y", function(d) { return ((empMinMax[1]-d.tot_emp)/(empMinMax[1]-0)*ch*0.75+30); })
+ 	  .attr("height", function(d) { return ((d.tot_emp-0)/(empMinMax[1]-0)*ch*0.75); })
+	  
+	// draw the title of the chart
+	var text = svg
+	   .append("text")
+	   .attr("x", 115)
+	   .attr("y", 15)
+	   .style("font-size", "16px")
+       .style("font-family", "Proxima Nova Rg")
+	   .text("Number of Employment")
+	   .attr("fill", "white")	
+	
+	// draw text of x-axis   
+	var text = svg.selectAll("g")
+	   .data(compareState)
+	   .append("text")
+	   .attr("x", function(d,i) { return (100+(compareW+50)*0+5+(5+compareBarW)*(i+1)+6); })
+	   .attr("y", ch*0.75+43)
+	   .style("font-size", "14px")
+	   .text(function(d) { return d.st; })
+	   .attr("fill", "white")
+	   .attr("transform", function(d,i) {return "rotate(0 "+ (100+(compareW+50)*0+5+(5+compareBarW)*(i+1)+10) +","+ (ch*0.75+40) +")" });
+	
+	// draw the national average value bar   
+	var empAvgBar = svg
+	   .append("rect")
+       .attr("x", 100+(compareW+50)*0+5)
+	   .attr("y", ch*0.75+30)
+	   .attr("width", compareBarW)
+	   .attr("height", 0)
+	   .attr("fill", "#FFA204")
+	   .attr("stroke", "white")
+	   .attr("stroke-width", 0.5)
+	   .attr("id", "avgempbar")
+	   .on("mouseover", function(d){
+	  		d3.select(this).style("stroke", "black").style("stroke-width", 2)
+  	  		svg.append("rect").attr("x", 100+(compareW+50)*0+5-10).attr("y", (empMinMax[1]-empAvg)/(empMinMax[1]-0)*ch*0.75+7.5)
+  	  		   .attr("width", 50).attr("height", 20).attr("fill", "grey").attr("id", "avgempBarRect")  	  		
+  	  		svg.append("text").attr("x", 100+(compareW+50)*0+5-5).attr("y", ((empMinMax[1]-empAvg)/(empMinMax[1]-0)*ch*0.75+20))
+  	  		   .text(empAvg).attr("fill", "white").style("font-size", "12px").attr("id", "avgempBarValue")  
+		})
+ 	   .on("mouseout", function(d){
+ 			d3.select(this).style("stroke", "white").style("stroke-width", 0.5)
+ 			d3.select("rect#" + "avgempBarRect").remove()
+  			d3.select("text#" + "avgempBarValue").remove()
+		});
+
+	// transition effect
+	d3.select("#chart2").select("svg").select("rect#avgempbar").transition().duration(2000)
+ 	  .attr("y", ((empMinMax[1]-empAvg)/(empMinMax[1]-0)*ch*0.75+30))
+ 	  .attr("height", ((empAvg-0)/(empMinMax[1]-0)*ch*0.75))
+ 	  	
+	// draw text of average value bar of x-axis		   
+	var text = svg
+	   .append("text")
+	   .attr("x", 100+(compareW+50)*0+11)
+	   .attr("y", ch*0.75+43)
+	   .style("font-size", "14px")
+       .style("font-family", "Proxima Nova Rg")
+	   .text("US")
+	   .attr("fill", "white")
+	   .attr("transform", function(d,i) {return "rotate(0 "+ (100+(compareW+50)*0+15) +","+ (ch*0.75+40) +")" });	   
+	
+	//  ADD THE AXIS   	  
+	var xaxisScale = d3.scale.linear()
+		.domain([])
+   		.range([0,compareW]);
+  
+	var xAxis = d3.svg.axis()
+   		.scale(xaxisScale);
+    
+	var xAxisGroup = svg.append("g")
+  	 	.attr("class", "x axis")
+   		.attr("transform", "translate(100,"+(ch*0.75+30)+")")
+   		.call(xAxis);
+   
+	var yaxisScale = d3.scale.linear()
+   		.domain([empMinMax[1],0])
+   		.range([0,ch*0.75]);
+
+	var yAxis = d3.svg.axis()
+   		.scale(yaxisScale)
+   		.orient("left");
+  
+	var yAxisGroup = svg.append("g")
+   		.attr("class", "y axis")
+   		.attr("transform", "translate(100,30)")
+   		.call(yAxis);
+   		
+//draw annual wage chart   		
+	var wageBar = svg.selectAll("g")
+	   .data(compareState)
+	   .append("rect")
+       .attr("x", function(d,i) { return (100+(compareW+50)*1+5+(5+compareBarW)*(i+1)); })
+	   .attr("y", ch*0.75+30)
+	   .attr("width", compareBarW)
+	   .attr("height", 0)
+	   .attr("fill", function(d){return mapcolor[d.id];})
+	   .attr("stroke", "white")
+	   .attr("stroke-width", 0.5)
+	   .attr("id", "wagebar")
+	   .on("mouseover", function(d,i){
+	  		d3.select(this).style("stroke", "black").style("stroke-width", 2)
+  	  		svg.append("rect").attr("x", 100+(compareW+50)*1+5+(5+compareBarW)*(i+1)-10).attr("y", (wageMinMax[1]-d.wage)/(wageMinMax[1]-0)*ch*0.75+7.5)
+  	  		   .attr("width", 50).attr("height", 20).attr("fill", "grey").attr("id", "wageBarRect")  	  		
+  	  		svg.append("text").attr("x", 100+(compareW+50)*1+5+(5+compareBarW)*(i+1)).attr("y", (wageMinMax[1]-d.wage)/(wageMinMax[1]-0)*ch*0.75+20)
+  	  		   .text(d.wage).attr("fill", "white").style("font-size", "12px").attr("id", "wageBarValue")   
+		})
+ 	   .on("mouseout", function(d){
+ 			d3.select(this).style("stroke", "black").style("stroke-width", 0.5)
+ 			d3.select("rect#" + "wageBarRect").remove()
+ 			d3.select("text#" + "wageBarValue").remove()
+		});
+
+	// transition effect
+	d3.select("#chart2").select("svg").selectAll("g").select("rect#wagebar").data(compareState).transition().duration(2000)
+ 	      .attr("y", function(d) { return ((wageMinMax[1]-d.wage)/(wageMinMax[1]-0)*ch*0.75+30); }) 	     	    
+ 	      .attr("height", function(d) { return ((d.wage-0)/(wageMinMax[1]-0)*ch*0.75); })
+ 	  
+	// draw the title of the chart
+	var text = svg
+	   .append("text")
+	   .attr("x", 100+(compareW+50)+20)
+	   .attr("y", 15)
+	   .style("font-size", "16px")
+       .style("font-family", "Proxima Nova Rg")
+	   .text("Annual Mean salary ($)")
+	   .attr("fill", "white")
+	
+	// draw text of x-axis   	   
+	var text = svg.selectAll("g")
+	   .data(compareState)
+	   .append("text")
+	   .attr("x", function(d,i) { return (100+(compareW+50)*1+5+(5+compareBarW)*(i+1)+6); })
+	   .attr("y", ch*0.75+43)
+	   .style("font-size", "14px")
+	   .text(function(d) { return d.st; })
+	   .attr("fill", "white")
+	   .attr("transform", function(d,i) {return "rotate(0 "+ (100+(compareW+50)*1+5+(5+compareBarW)*(i+1)+10) +","+ (ch*0.75+40) +")" });
+
+	// draw the national average value bar
+	var wageAvgBar = svg
+	   .append("rect")
+       .attr("x", 100+(compareW+50)*1+5)
+	   .attr("y", ch*0.75+30)
+	   .attr("width", compareBarW)
+	   .attr("height", 0)
+	   .attr("fill", "#FFA204")
+	   .attr("stroke", "white")
+	   .attr("stroke-width", 0.5)
+	   .attr("id", "avgwagebar")
+	   .on("mouseover", function(d){
+	  		d3.select(this).style("stroke", "black").style("stroke-width", 2)
+  	  		svg.append("rect").attr("x", 100+(compareW+50)*1-5).attr("y", (wageMinMax[1]-wageAvg)/(wageMinMax[1]-0)*ch*0.75+7.5)
+  	  		   .attr("width", 50).attr("height", 20).attr("fill", "grey").attr("id", "avgwageBarRect")  	  		
+  	  		svg.append("text").attr("x", 100+(compareW+50)*1+5).attr("y", (wageMinMax[1]-wageAvg)/(wageMinMax[1]-0)*ch*0.75+20)
+  	  		   .text(wageAvg).attr("fill", "white").style("font-size", "12px").attr("id", "avgwageBarValue")   
+		})
+ 	   .on("mouseout", function(d){
+ 			d3.select(this).style("stroke", "white").style("stroke-width", 0.5)
+ 			d3.select("rect#" + "avgwageBarRect").remove()
+ 			d3.select("text#" + "avgwageBarValue").remove()
+		});
+
+	// transition effect
+	d3.select("#chart2").select("svg").select("rect#avgwagebar").transition().duration(2000)
+ 	      .attr("y", ((wageMinMax[1]-wageAvg)/(wageMinMax[1]-0)*ch*0.75+30))
+ 	      .attr("height", ((wageAvg-0)/(wageMinMax[1]-0)*ch*0.75))
+ 	  	
+	// draw text of average value bar of x-axis   
+	var text = svg
+	   .append("text")
+	   .attr("x", 100+(compareW+50)*1+11)
+	   .attr("y", ch*0.75+43)
+	   .style("font-size", "14px")
+       .style("font-family", "Proxima Nova Rg")
+	   .text("US")
+	   .attr("fill", "white")
+	   .attr("transform", function(d,i) {return "rotate(0 "+ (100+(compareW+50)*1+15) +","+ (ch*0.75+40) +")" });
+	
+	//  ADD THE AXIS   	   	   	  
+	var xaxisScale = d3.scale.linear()
+		.domain([])
+   		.range([0,compareW]);
+  
+	var xAxis = d3.svg.axis()
+   		.scale(xaxisScale);
+  
+	var xAxisGroup = svg.append("g")
+  	 	.attr("class", "x axis")
+   		.attr("transform", "translate("+(100+(compareW+50))+","+(ch*0.75+30)+")")
+   		.call(xAxis);
+   
+	var yaxisScale = d3.scale.linear()
+   		.domain([wageMinMax[1],0])
+   		.range([0,ch*0.75]);
+  
+	var yAxis = d3.svg.axis()
+   		.scale(yaxisScale)
+   		.orient("left");
+  
+	var yAxisGroup = svg.append("g")
+   		.attr("class", "y axis")
+   		.attr("transform", "translate("+(100+(compareW+50))+",30)")
+   		.call(yAxis);
+
+//draw loc_q chart   		
+	var locBar = svg.selectAll("g")
+	   .data(compareState)
+	   .append("rect")
+       .attr("x", function(d,i) { return (100+(compareW+50)*2+5+(5+compareBarW)*(i+1)); })
+	   .attr("y", ch*0.75+30)
+	   .attr("width", compareBarW)
+	   .attr("height", 0)
+	   .attr("fill", function(d){return mapcolor[d.id];})
+	   .attr("stroke", "white")
+	   .attr("stroke-width", 0.5)
+	   .attr("id", "locbar")
+	   .on("mouseover", function(d,i){
+	  		d3.select(this).style("stroke", "black").style("stroke-width", 2)
+  	  		svg.append("rect").attr("x", 100+(compareW+50)*2+5+(5+compareBarW)*(i+1)-3).attr("y", (locMinMax[1]-d.loc_q)/(locMinMax[1]-0)*ch*0.75+7.5)
+  	  		   .attr("width", 35).attr("height", 20).attr("fill", "grey").attr("id", "locBarRect")   	  		
+  	  		svg.append("text").attr("x", 100+(compareW+50)*2+5+(5+compareBarW)*(i+1)+6).attr("y", (locMinMax[1]-d.loc_q)/(locMinMax[1]-0)*ch*0.75+20)
+  	  		   .text((d.loc_q).toFixed(1)).attr("fill", "white").style("font-size", "12px").attr("id", "locBarValue")    
+		})
+ 	   .on("mouseout", function(d){
+ 			d3.select(this).style("stroke", "white").style("stroke-width", 0.5)
+ 			d3.select("rect#" + "locBarRect").remove()
+ 			d3.select("text#" + "locBarValue").remove()
+		});
+
+	// transition effect
+	d3.select("#chart2").select("svg").selectAll("g").select("rect#locbar").data(compareState).transition().duration(2000)
+ 	      .attr("y", function(d) { return ((locMinMax[1]-d.loc_q)/(locMinMax[1]-0)*ch*0.75+30); }) 	     	    
+ 	      .attr("height", function(d) { return ((d.loc_q-0)/(locMinMax[1]-0)*ch*0.75); })
+ 	  
+	// draw the title of the chart
+	var text = svg
+	   .append("text")
+	   .attr("x", 100+(compareW+50)*2+45)
+	   .attr("y", 15)
+	   .style("font-size", "16px")
+       .style("font-family", "Proxima Nova Rg")
+	   .text("Job popularity")
+	   .attr("fill", "white")
+	
+	// draw text of x-axis   	   		
+	var text = svg.selectAll("g")
+	   .data(compareState)
+	   .append("text")
+	   .attr("x", function(d,i) { return (100+(compareW+50)*2+5+(5+compareBarW)*(i+1)+6); })
+	   .attr("y", ch*0.75+43)
+	   .style("font-size", "14px")
+	   .text(function(d) { return d.st; })
+	   .attr("fill", "white")
+	   .attr("transform", function(d,i) {return "rotate(0 "+ (100+(compareW+50)*2+5+(5+compareBarW)*(i+1)+10) +","+ (ch*0.75+40) +")" });
+	
+	// draw the national average value bar
+	var locAvgBar = svg
+	   .append("rect")
+       .attr("x", 100+(compareW+50)*2+5)
+	   .attr("y", ch*0.75+30)
+	   .attr("width", compareBarW)
+	   .attr("height", 0)
+	   .attr("fill", "#FFA204")
+	   .attr("stroke", "white")
+	   .attr("stroke-width", 0.5)
+	   .attr("id", "avglocbar")
+	   .on("mouseover", function(d,i){
+	  		d3.select(this).style("stroke", "black").style("stroke-width", 2)
+  	  		svg.append("rect").attr("x", 100+(compareW+50)*2+2).attr("y", (locMinMax[1]-locAvg)/(locMinMax[1]-0)*ch*0.75+7.5)
+  	  		   .attr("width", 35).attr("height", 20).attr("fill", "grey").attr("id", "avglocBarRect")  	  		
+  	  		svg.append("text").attr("x", 100+(compareW+50)*2+11).attr("y", (locMinMax[1]-locAvg)/(locMinMax[1]-0)*ch*0.75+20)
+  	  		   .text(locAvg.toFixed(1)).attr("fill", "white").style("font-size", "12px").attr("id", "avglocBarValue")    
+		})
+ 	   .on("mouseout", function(d){
+ 			d3.select(this).style("stroke", "white").style("stroke-width", 0.5)
+ 			d3.select("rect#" + "avglocBarRect").remove()
+ 			d3.select("text#" + "avglocBarValue").remove()
+		});
+
+	// transition effect
+	d3.select("#chart2").select("svg").select("rect#avglocbar").transition().duration(2000)
+ 	      .attr("y", ((locMinMax[1]-locAvg)/(locMinMax[1]-0)*ch*0.75+30)) 	     	    
+ 	      .attr("height", ((locAvg-0)/(locMinMax[1]-0)*ch*0.75))
+ 	  	
+	// draw text of average value bar of x-axis   
+	var text = svg
+	   .append("text")
+	   .attr("x", 100+(compareW+50)*2+11)
+	   .attr("y", ch*0.75+43)
+	   .style("font-size", "14px")
+       .style("font-family", "Proxima Nova Rg")
+	   .text("US")
+	   .attr("fill", "white")
+	   .attr("transform", function(d,i) {return "rotate(0 "+ (100+(compareW+50)*2+15) +","+ (ch*0.75+40) +")" });
+	
+	//  ADD THE AXIS   	   	   	  
+	var xaxisScale = d3.scale.linear()
+		.domain([])
+   		.range([0,compareW]);
+  
+	var xAxis = d3.svg.axis()
+   		.scale(xaxisScale);
+  
+	var xAxisGroup = svg.append("g")
+  	 	.attr("class", "x axis")
+   		.attr("transform", "translate("+(100+(compareW+50)*2)+","+(ch*0.75+30)+")")
+   		.call(xAxis);
+   
+	var yaxisScale = d3.scale.linear()
+   		.domain([locMinMax[1],0])
+   		.range([0,ch*0.75]);
+  
+	var yAxis = d3.svg.axis()
+   		.scale(yaxisScale)
+   		.orient("left");
+  
+	var yAxisGroup = svg.append("g")
+   		.attr("class", "y axis")
+   		.attr("transform", "translate("+(100+(compareW+50)*2)+",30)")
+   		.call(yAxis);
+
+//draw unemployment chart   		
+	var unempBar = svg.selectAll("g")
+	   .data(compareState)
+	   .append("rect")
+       .attr("x", function(d,i) { return (100+(compareW+50)*3+5+(5+compareBarW)*(i+1)); })
+	   .attr("y", ch*0.75+30)
+	   .attr("width", compareBarW)
+	   .attr("height", 0)
+	   .attr("fill", function(d){return mapcolor[d.id];})
+	   .attr("stroke", "white")
+	   .attr("stroke-width", 0.5)
+	   .attr("id", "unempbar")
+	   .on("mouseover", function(d,i){
+	  		d3.select(this).style("stroke", "black").style("stroke-width", 2)
+  	  		svg.append("rect").attr("x", 100+(compareW+50)*3+5+(5+compareBarW)*(i+1)-3).attr("y", (unempMinMax[1]-d.unemployment)/(unempMinMax[1]-0)*ch*0.75+7.5)
+  	  		   .attr("width", 35).attr("height", 20).attr("fill", "grey").attr("id", "unempBarRect")   	  		
+  	  		svg.append("text").attr("x", 100+(compareW+50)*3+5+(5+compareBarW)*(i+1)+6).attr("y", (unempMinMax[1]-d.unemployment)/(unempMinMax[1]-0)*ch*0.75+20)
+  	  		   .text(d.unemployment).attr("fill", "white").style("font-size", "12px").attr("id", "unempBarValue")    
+		})
+ 	   .on("mouseout", function(d){
+ 			d3.select(this).style("stroke", "white").style("stroke-width", 0.5)
+  			d3.select("rect#" + "unempBarRect").remove()
+  			d3.select("text#" + "unempBarValue").remove() 
+		});
+
+	// transition effect
+	d3.select("#chart2").select("svg").selectAll("g").select("rect#unempbar").data(compareState).transition().duration(2000)
+ 	      .attr("y", function(d) { return ((unempMinMax[1]-d.unemployment)/(unempMinMax[1]-0)*ch*0.75+30); }) 	     	    
+ 	      .attr("height", function(d) { return ((d.unemployment-0)/(unempMinMax[1]-0)*ch*0.75); })
+ 	  
+	// draw the title of the chart
+	var text = svg
+	   .append("text")
+	   .attr("x", 100+(compareW+50)*3+10)
+	   .attr("y", 15)
+	   .style("font-size", "16px")
+       .style("font-family", "Proxima Nova Rg")
+	   .text("Unemployment rate (%)")
+	   .attr("fill", "white")
+	
+	// draw text of x-axis   	   		
+	var text = svg.selectAll("g")
+	   .data(compareState)
+	   .append("text")
+	   .attr("x", function(d,i) { return (100+(compareW+50)*3+5+(5+compareBarW)*(i+1)+6); })
+	   .attr("y", ch*0.75+43)
+	   .style("font-size", "14px")
+	   .text(function (d) { return d.st; })
+	   .attr("fill", "white")
+	   .attr("transform", function(d,i) {return "rotate(0 "+ (100+(compareW+50)*3+5+(5+compareBarW)*(i+1)+10) +","+ (ch*0.75+40) +")" });
+
+	// draw the national average value bar
+	var unempAvgBar = svg
+	   .append("rect")
+       .attr("x", 100+(compareW+50)*3+5)
+	   .attr("y", ch*0.75+30)
+	   .attr("width", compareBarW)
+	   .attr("height", 0)
+	   .attr("fill", "#FFA204")
+	   .attr("stroke", "white")
+	   .attr("stroke-width", 0.5)
+	   .attr("id", "avgunempbar")
+	   .on("mouseover", function(d){
+	  		d3.select(this).style("stroke", "black").style("stroke-width", 2)
+  	  		svg.append("rect").attr("x", 100+(compareW+50)*3+2).attr("y", (unempMinMax[1]-unempAvg)/(unempMinMax[1]-0)*ch*0.75+7.5)
+  	  		   .attr("width", 35).attr("height", 20).attr("fill", "grey").attr("id", "avgunempBarRect")  	  		
+  	  		svg.append("text").attr("x", 100+(compareW+50)*3+11).attr("y", (unempMinMax[1]-unempAvg)/(unempMinMax[1]-0)*ch*0.75+20)
+  	  		   .text(unempAvg).attr("fill", "white").style("font-size", "12px").attr("id", "avgunempBarValue")    
+		})
+ 	   .on("mouseout", function(d){
+ 			d3.select(this).style("stroke", "white").style("stroke-width", 0.5)
+  			d3.select("rect#" + "avgunempBarRect").remove()
+  			d3.select("text#" + "avgunempBarValue").remove() 
+		});
+
+	// transition effect
+	d3.select("#chart2").select("svg").select("rect#avgunempbar").transition().duration(2000)
+ 	      .attr("y", ((unempMinMax[1]-unempAvg)/(unempMinMax[1]-0)*ch*0.75+30)) 	     	    
+ 	      .attr("height", ((unempAvg-0)/(unempMinMax[1]-0)*ch*0.75))
+ 	  	
+	// draw text of average value bar of x-axis		   
+	var text = svg
+	   .append("text")
+	   .attr("x", 100+(compareW+50)*3+11)
+	   .attr("y", ch*0.75+43)
+	   .style("font-size", "14px")
+       .style("font-family", "Proxima Nova Rg")
+	   .text("US")
+	   .attr("fill", "white")
+	   .attr("transform", function(d,i) {return "rotate(0 "+ (100+(compareW+50)*3+15) +","+ (ch*0.75+40) +")" });
+	
+	//  ADD THE AXIS   	   	   	  
+	var xaxisScale = d3.scale.linear()
+		.domain([])
+   		.range([0,compareW]);
+  
+	var xAxis = d3.svg.axis()
+   		.scale(xaxisScale);
+  
+	var xAxisGroup = svg.append("g")
+  	 	.attr("class", "x axis")
+   		.attr("transform", "translate("+(100+(compareW+50)*3)+","+(ch*0.75+30)+")")
+   		.call(xAxis);
+   
+	var yaxisScale = d3.scale.linear()
+   		.domain([unempMinMax[1],0])
+   		.range([0,ch*0.75]);
+  
+	var yAxis = d3.svg.axis()
+   		.scale(yaxisScale)
+   		.orient("left");
+  
+	var yAxisGroup = svg.append("g")
+   		.attr("class", "y axis")
+   		.attr("transform", "translate("+(100+(compareW+50)*3)+",30)")
+   		.call(yAxis);
+}
+
+function commafy(num) {
+	if(num==null) return null;
+	else{
+	    var str = num.toString().split('.');
+	    if (str[0].length >= 5) {
+	        str[0] = str[0].replace(/(\d)(?=(\d{3})+$)/g, '$1,');
+	    }
+	    if (str[1] && str[1].length >= 5) {
+	        str[1] = str[1].replace(/(\d{3})/g, '$1 ');
+	    }
+	    return str.join('.');
+	}
+}
+
+function addfavorite(){
+	
+	compareState = []
+	for (var j=0; j<compareList.length; j++){
+		compareState.push({id:compareList[j], st:unemployment[compareList[j]]['st'], state:mapdata[compareList[j]][0], unemployment:mapdata[compareList[j]][1], wage:mapdata[compareList[j]][4], loc_q:mapdata[compareList[j]][3], tot_emp:mapdata[compareList[j]][2]});
+	}
+
+	d3.select("#comparelist").select("svg").remove();
+	
+
+	var w=cw,h=20;
+
+	var svg=d3.select("#comparelist") 
+		.append("svg") 
+		.attr("width",w).attr("height",h); 
+	
+	var barchart = svg.selectAll("g")
+		.data(compareState)
+		.enter()
+		.append("g");
+
+	var addButton = svg.selectAll("g")
+	   .data(compareState)
+	   .append("svg:image")
+	   .attr("x", function(d,i) { return (i*70+70); })
+	   .attr("y", 2)  		
+	   .attr("width", 15)
+	   .attr("height", 15)
+	   .attr("xlink:href", function (d) { 
+			if (in_favoriteList(d.st)) {return ("img/red_heart.png");} 
+			else {return ("img/heart_empty.png");}  })
+
+	   .attr("id", function (d) { return (d.st); })
+
+       	.on("mouseover", function (d) {
+
+       	    d3.select(this).attr("xlink:href", "img/red_heart.png")
+
+       	})
+
+ 	    .on("mouseout", function (d) {
+
+ 	        d3.select(this).attr("xlink:href", function (d) { 
+			if (in_favoriteList(d.st)) {return ("img/red_heart.png");} 
+			else {return ("img/heart_empty.png");}  })
+ 	    })
+	   .on("click", function(d,i) { return fly(d.st, i); })
+						
+	var text = svg.selectAll("g")
+	   .data(compareState)
+	   .append("text")
+	   .attr("x", function(d,i) { return (i*70+90); })
+	   .attr("y", 13)
+	   .style("font-size", "13px")
+
+	   /*.style("font-weight", "bold")*/
+
+       .style("font-family", "abeatbyKai")
+	   .text(function(d) { return d.st; })
+	   .attr("fill", "white")
+
+// 	var text = svg.selectAll("g")
+// 	   .data(compareState)
+// 	   .append("text")
+// 	   .attr("x", function(d,i) { return (i*120+90); })
+// 	   .attr("y", 13)
+// 	   .style("font-size", "15px")
+// 	   .style("font-weight", "bold")
+// 	   .text(function(d) { return d.state; })
+// 	   .attr("fill", "white")
+// 	   .style("opacity", 0)
+// 	   .attr("id", function(d) { return (d.state.replace(" ",".")+"comparetext"); })
+	
+	addfavoritelist();
+}
+
+favoritelist_open = false
+function addfavoritelist(){
+	
+	d3.select("#favoritecar_list").select("svg").remove();
+	
+	var w=100; h=(favoriteList.length+2)*20+30;
+
+	var svg=d3.select("#favoritecar_list") 
+		.append("svg") 
+		.attr("width",w).attr("height",h); 
+	
+	var barchart = svg.selectAll("g")
+		.data(favoriteList)
+		.enter()
+		.append("g");
+// 
+// // 	write "Favorite" text
+// 	var text = svg
+// 	   .append("text")
+// 	   .attr("x", 27)
+// 	   .attr("y", 20)
+// 	   .style("font-size", "15px")
+// 	   .text("Favorite")
+// 
+// 	   .attr("fill", "#E6E7E8")
+// 	   .on("mouseover", function(d){
+// 	  		d3.select(this).style("text-decoration","underline") 
+// 		})
+//  	   .on("mouseout", function(d){
+// 			d3.select(this).style("text-decoration","none")
+// 		})
+// 	   .on("click", function(d) { open(); })
+// 
+// // 	write the number of states in favorite list	   
+// 	var text = svg
+// 	   .append("text")
+// 	   .attr("x", 43)
+// 	   .attr("y", 50)
+// 	   .style("font-size", "23px")
+// 	   .text(favoriteList.length)
+// 
+// 	   .attr("fill", "#F2787A")
+// 
+	$(".num_favorite").html(favoriteList.length);
+	d3.selectAll(".favorite1").remove();	   						
+	d3.select(".favorite2").remove();	
+	console.log("111");
+	for(var i=0; i<favoriteList.length;i++)
+	{
+		d3.select("#favorite").append("div").attr("class","favorite1").html('<span>'+favoriteList[i]+'</span>');		
+	}
+// 	d3.selectAll(".favorite1").append("div").attr("class","favorite3").html('<img src="img/x-mark.png"/>');
+	
+	d3.select("#favorite").append("div").attr("class","favorite2");
+// 	write the state name in favorite list	   						
+// 	var text = svg.selectAll("g")
+// 	   .data(favoriteList)
+// 	   .append("text")
+// 	   .attr("x", 25)
+// 	   .attr("y", function(d,i) {return i*20+80; })
+// 	   .style("font-size", "14px")
+// 	   .text(function(d) { return d; })
+// 
+// 	   .attr("fill", "#E6E7E8")
+// 
+// 	draw delete mark	   
+	var xmark = svg.selectAll("g")
+	   .data(favoriteList)
+	   .append("svg:image")
+	   .attr("x", 60)
+	   .attr("y", function(d,i) {return i*20+35; })
+	   .attr("width", 17)
+	   .attr("height", 17)
+	   .attr("xlink:href","img/x-mark.png")
+	   .style("opacity", 0.8)
+	   .on("click", function(d,i) { return deleItem(i); })
+
+}
+
+// Do the fly effect, and count the state number in favorite list.
+favoriteList = []
+function fly(s, i){	 
+	
+	if (!in_favoriteList(s))
+		favoriteList.push(s);
+	else
+		deleItem(favoriteList.indexOf(s));
+		   	
+   	addfavorite();
+}
+
+function in_favoriteList(s){
+	for (var i=0; i<favoriteList.length; i++){
+		if (favoriteList[i] == s){
+			return true;
+		}
+	}
+	return false;	
+}
+
+function deleItem(i){
+	favoriteList.splice(i,1)
+	addfavorite();
+}
+
+function open(){
+	if (favoritelist_open == false){
+		favoritelist_open = true
+		d3.select("#favoritecar_list").select("svg").attr("height", 50)
+		
+	}else{
+		favoritelist_open = false
+		d3.select("#favoritecar_list").select("svg").attr("height", (favoriteList.length+2)*20+10)
+	}
+}
+
+
+</script>
+
+</body>
+</html>
