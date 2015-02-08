@@ -1,0 +1,9 @@
+color:
+Deep Deep Green:294F4B
+Deep green: #366964
+green:#8FBEB8
+grey green:9DC2AF
+grey:#B8BFAF
+orange:#CA652A
+white:#FCF1C6
+
