@@ -1,0 +1,284 @@
+body 
+{
+  background : #414042;
+    }
+
+#filter_frame 
+{
+  background : #808285;
+  background : rgba(128, 130, 133, 1);
+  border-radius : 13px  / 11px;
+  -moz-border-radius : 13px  / 11px;
+  -webkit-border-radius : 13px  / 11px;
+  
+  width:25%;
+  padding:10px 20px 10px 20px;
+  margin: 5px 10px 10px 20px;
+  display:inline-block;
+  text-align:center;
+}
+
+    
+            #autocomplete, #submit
+        {
+	        float: left;
+        }
+
+        #autocomplete
+        {
+	        padding: 5px 9px;
+	        height: 26px;
+	        width: 90%;
+	        border: 1px;
+	        font: normal 13px 'trebuchet MS', arial, helvetica;
+	        color: #f1f1f2;
+	        background: #6d6e70;
+	        margin-bottom:20px;
+	        
+	        border-width: 1px;
+	        border-style: solid;
+	        border-color: #404041 #58595b #bbbdbf;
+	
+	        -moz-border-radius: 50px 3px 3px 50px;
+	         border-radius: 50px 3px 3px 50px;
+
+	         -moz-box-shadow: 0 1px 3px rgba(255, 255, 255, 0.25) inset, 0 1px 0 rgba(0, 0, 0, 1);
+	         -webkit-box-shadow: 0 1px 3px rgba(255, 255, 255, 0.25) inset, 0 1px 0 rgba(0, 0, 0, 1);
+	         box-shadow: 0 1px 3px rgba(255, 255, 255, 0.25) inset, 0 1px 0 rgba(0, 0, 0, 1); 	         
+	         -moz-box-shadow: 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+	         -webkit-box-shadow: 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+	         box-shadow: 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.3) inset;  
+
+ 		                    
+        }
+
+        /* ----------------------- */
+
+        #submit
+        {		
+	        background: #58595b;
+	        background-image: -moz-linear-gradient(#6d6e71, #58595b);
+	        background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #58595b),color-stop(1, #6d6e71));
+	        background-image:("search.png");
+	
+	        -moz-border-radius: 3px 50px 50px 3px;
+	        border-radius: 3px 50px 50px 3px;
+	
+	        border-width: 1px;
+	        border-style: solid;
+	        border-color: #bbbdc0 #58595b #404041;
+	
+	         -moz-box-shadow: 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+	         -webkit-box-shadow: 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+	         box-shadow: 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.3) inset;   		
+
+	        height: 27px;
+	        margin: 0 0 0 0;
+                padding: 0;
+	        width: 10%;
+	        cursor: pointer;
+	        font: bold 14px Arial, Helvetica;
+	        color: #bbbdbf;
+	
+	        text-shadow: 0 1px 0 rgba(0,0,0,0.5);
+        }
+
+        #submit:hover
+        {		
+	        background: #58595b;
+	        background-image: -moz-linear-gradient(#58595b, #6d6e71);
+	        background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #6d6e71),color-stop(1, #58595b));
+        }	
+
+        #submit:active
+        {		
+	        background: #58595b;
+	        outline: none;
+   
+	         -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) inset;
+	         -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) inset;
+	         box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) inset;		
+        }
+
+        #submit::-moz-focus-inner
+        {
+               border: 0;  /* Small centering fix for Firefox */
+        }  
+        
+        #autocomplete::-webkit-input-placeholder {
+           color: #9c9c9c;
+           font-style: italic;
+        }
+
+        #autocomplete:-moz-placeholder {
+           color: #9c9c9c;
+           font-style: italic;
+        }  
+
+        #autocomplete:-ms-placeholder {
+           color: #9c9c9c;
+           font-style: italic;
+        }
+        #autocomplete.placeholder {
+           color: #9c9c9c !important;
+           font-style: italic;
+        }   
+
+    #occupation
+    {
+        width:100%;
+        margin:5px 0 5px 0;
+        }
+               
+    #occupation_small
+    {
+        width:100%;
+        margin:5px 0 15px 0px;
+        } 
+        
+    #job_popu_frame
+    {
+        width:50%;
+        display:inline-block;
+        margin:0 0 20px 20px;
+        }   
+ 
+    #statedropdown
+    {
+        width:40%;
+        display:inline-block;
+        margin:0 20px 20px 0;
+
+        }
+    #jobpopularity {width:110%;}    
+        
+    #jobpopularity option { color: black; }
+    .empty { color: gray; } 
+    
+        label {  
+            display: inline-block;  
+            cursor: pointer;  
+            position: relative;  
+            padding-left: 10px;  
+            margin-right: 20px;  
+            font-size: 14px;  
+        }
+        
+      /*      input[type=radio] {  
+                display: none;  
+            }
+            
+            label:before {  
+                content: "";  
+                display: inline-block;  
+  
+                width: 16px;  
+                height: 16px;  
+  
+                margin-right: 10px;  
+                position: absolute;  
+                left: 0;  
+                bottom: 1px;  
+                background-color: #aaa;  
+                box-shadow: inset 0px 2px 3px 0px rgba(0, 0, 0, .3), 0px 1px 0px 0px rgba(255, 255, 255, .8);
+                border-radius : 8px;  
+            }  
+                    
+  
+  
+            input[type=radio]:checked + label:before {  
+                content: "\2022";  
+                color: #f3f3f3;  
+                font-size: 30px;  
+                text-align: center;  
+                line-height: 18px;  
+            } */
+    
+
+#map_frame
+{    
+    width:60%;
+    padding:5px 20px 5px 20px;
+    margin:5px 20px 10px 10px;
+    display:inline-block;
+    text-align:center;
+    } 
+    
+#summary_frame
+{
+  background : #6D6E71;
+  background : rgba(109, 110, 113, 1);
+  border-radius : 12px  / 20px;
+  -moz-border-radius : 12px  / 20px;
+  -webkit-border-radius : 12px  / 20px;
+  
+  width:90%;
+  display:block;
+  padding:20px 20px 20px 20px;
+  margin:5px 20px 10px 10px;
+  
+  
+}
+
+
+
+
+.background {
+  fill: none;
+  pointer-events: all;
+}
+
+#states {
+  fill: #aaa;
+}
+
+#states .active {
+  fill: orange;
+}
+
+#state-borders {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+div.tooltip {
+    position: absolute;
+    width: 180px;
+    text-align: left;
+    padding: 5px 5px 5px 10px;
+    font: 10px Verdana;
+    background: white;
+    border: 2px;
+    border-radius: 8px;
+    pointer-events: none;
+    box-shadow:0 0 10px 1px #555;
+    line-height: 0px;
+}
+
+.tooltip p{
+  font-size: 12px;
+  color: black;
+  line-height: 10px;
+}
+
+.title{
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.greenfont{
+  font-size: 12px;
+  color: green;
+  margin-right: 10px;
+}
+.redfont{
+  font-size: 12px;
+  color: red;
+  margin-right: 10px;
+}
+#occupation_small{
+display:none; 
+}

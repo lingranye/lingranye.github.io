@@ -1,0 +1,693 @@
+body 
+{
+  background : #404041;
+  font-size:x-small;
+
+  
+  
+}
+.background {
+  fill: none;
+  pointer-events: all;
+}
+
+#states {
+  fill: #aaa;
+}
+
+#states .active {
+  fill: orange;
+}
+
+#state-borders {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+div.tooltip {
+    border-style: none;
+    border-color: inherit;
+    border-width: 2px;
+    background-position: 0% 0%;
+    position: absolute;
+    /*top:10px;
+    right:10px;*/
+    /*width: 180px;*/
+    text-align: left;
+    padding: 5px 5px 5px 10px;
+    border-radius: 8px;
+    pointer-events: none;
+    box-shadow:0 0 10px 1px #555;
+    line-height: 0px;
+    opacity: 0.9;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+    font-size: 10px;
+    font-family: Verdana;
+    background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #231F20),color-stop(1, #58595B));
+    background-color: white;
+    background-repeat: repeat;
+    background-attachment: scroll;
+}
+
+.tooltip p{
+  font-size: 12px;
+  color:#D1D2D4;
+  line-height: 10px;
+}
+
+#selectedOccupation 
+{
+    position:fixed;
+    top:18px;
+    width:100%;
+    text-align:center;
+    }
+    
+ #map_title{
+    position:fixed;
+    top:3px;
+    width:100%;
+    text-align:center;
+    }   
+
+.title
+{
+  font-family: "abeatbyKai", Verdana, Tahoma;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.greenfont{
+  font-size: 12px;
+  color: #6DC178;
+  margin-right: 10px;
+}
+.redfont{
+  font-size: 12px;
+  color: #E56055;
+  margin-right: 10px;
+}
+#occupation_small{
+display:none; 
+}
+
+/* css in summary chart */	
+.axis path,
+.axis line {
+	fill: none;
+	stroke: white;
+	shape-rendering: crispEdges;
+	color:White;
+}
+
+.axis text {
+	font-family: sans-serif;
+	font-size: 11px;
+	color:White;
+	fill: white;
+}
+
+#favorite{
+    width:83px;
+    position:fixed;
+    top:-10px;
+    right:10px;
+    text-align:center;
+    padding:10px 10px 10px 3px;
+    color:white;
+    opacity:0.9;
+    filter:alpha(opacity=90); 
+}
+
+.favoritetitle 
+{
+    height:40px;
+    width:83px;
+    background-image:url(flag1.png);
+    background-repeat:repeat-y;
+    text-align:center;
+    color:white;
+    margin: 0 0 0 0;
+    padding-top: 5;
+    font-size: 15px;
+    font-family:Proxima Nova Rg;
+}
+
+.favoritetitle .num_favorite
+{
+margin-top: 0px;
+
+}
+
+.favorite1 /*the begining of the flag*/
+{
+    height:20px;
+    width:83px;
+    background-image:url(flag1.png);
+    background-repeat:no-repeat;
+    text-align:left;
+    color:White;
+    margin: 0 0 0 0;
+    opacity:0.9;
+    filter:alpha(opacity=90);    
+}
+
+.favorite1 span{ /*the middle part of the flag*/
+    padding-left: 20px;
+    margin: 0 0 0 0;
+    width: 50px;
+    opacity:0.9;
+    filter:alpha(opacity=90);    
+}
+
+.favorite2 /*the end part of the flag*/
+{
+    height:40px;
+    width:83px;
+    background-image:url(flag2.png);
+    background-repeat:no-repeat;
+    text-align:center;
+    color:White;
+    margin: 0 0 0 0;
+    opacity:0.9;
+    filter:alpha(opacity=90);
+}
+
+
+
+
+#summary_frame
+{
+  background-position: 0% 0%;
+    border-radius : 12px  / 20px;
+    -moz-border-radius : 12px  / 20px;
+    -webkit-border-radius : 12px  / 20px;
+  
+    padding:25px 10px 10px 0px;
+    margin:5px 0px 10px 10px;
+    opacity: 0.9;
+    background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #414042),color-stop(1, #58595B));
+    background-color: #808284;
+    background-repeat: repeat;
+    background-attachment: scroll;
+} 
+.change {
+float:left;
+margin: 100px 10px 10px 0px;
+}
+
+#chart2
+{
+text-align:center;
+margin:-290px 0px 20px 30px;
+float:left;
+}
+
+#comparelist{
+margin-top:-10px;
+}
+
+
+#favoritecar_list{
+position:fixed;
+right:12px;
+color:white;
+margin-top:-920px;
+margin-left:1000px;
+width:100px;
+height:auto;
+}
+/* end */
+
+
+#title1,#title2,#title3,#title4 
+{
+    width:100%; text-align:center; border-bottom: 1px solid White; line-height:0em; margin:20px 0 20px; 
+} 
+
+#title1_sp,#title2_sp,#title3_sp1,#title3_sp2,#title4_sp { background: #808284; padding:0 10px; }
+
+#filter_frame 
+{
+  background : #808284;
+  border-radius : 13px  / 11px;
+  -moz-border-radius : 13px  / 11px;
+  -webkit-border-radius : 13px  / 11px;
+  
+  width:20%;
+  padding:20px 20px 10px 20px;
+  margin: 0px 10px 0px 10px;
+  /*display:inline-block;*/
+  float:left;
+  text-align:center;
+}
+
+        #autocomplete
+
+        {
+
+	        float: left;
+
+        }
+        #autocomplete
+        {
+	       
+	        padding: 5px 9px;
+	        height: 26px;
+	        width: 90%;
+	        border: 1px;
+	        font: normal 13px 'trebuchet MS', arial, helvetica;
+	        color: #e6e7e8;
+	        background: #6d6e70;
+	        margin-bottom:20px;
+	
+	        border-width: 1px;
+	        border-style: solid;
+	        border-color: #404041 #58595b #bbbdbf;
+
+	        -moz-border-radius: 50px 3px 3px 50px;
+	         border-radius: 50px 3px 3px 50px;
+
+	         -moz-box-shadow: 0 1px 3px rgba(255, 255, 255, 0.25) inset, 0 1px 0 rgba(0, 0, 0, 1);
+	         -webkit-box-shadow: 0 1px 3px rgba(255, 255, 255, 0.25) inset, 0 1px 0 rgba(0, 0, 0, 1);
+	         box-shadow: 0 1px 3px rgba(255, 255, 255, 0.25) inset, 0 1px 0 rgba(0, 0, 0, 1); 	         
+	         -moz-box-shadow: 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+	         -webkit-box-shadow: 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+	         box-shadow: 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.3) inset;  
+
+					
+        }
+
+/* ----------------------- */
+
+        #submit
+        {		
+	        background: #58595b;
+	        background-image: -moz-linear-gradient(#6d6e71, #58595b);
+	        background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #58595b),color-stop(1, #6d6e71));
+	        background-image:("search.png");
+
+	        -moz-border-radius: 3px 50px 50px 3px;
+	        border-radius: 3px 50px 50px 3px;
+
+	        border-width: 1px;
+	        border-style: solid;
+	        border-color: #bbbdc0 #58595b #404041;
+
+	         -moz-box-shadow: 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+	         -webkit-box-shadow: 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+	         box-shadow: 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.3) inset;   		
+
+	        height: 27px;
+	        margin: 0 0 0 0;
+		        padding: 0;
+	        width: 10%;
+	        cursor: pointer;
+	        font: bold 14px Arial, Helvetica;
+	        color: #bbbdbf;
+
+	        text-shadow: 0 1px 0 rgba(0,0,0,0.5);
+        }
+
+        #submit:hover
+        {		
+	        background: #58595b;
+	        background-image: -moz-linear-gradient(#58595b, #6d6e71);
+	        background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #6d6e71),color-stop(1, #58595b));
+        }	
+
+        #submit:active
+        {		
+	        background: #58595b;
+	        outline: none;
+
+	         -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) inset;
+	         -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) inset;
+	         box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) inset;		
+        }
+
+        #submit::-moz-focus-inner
+        {
+	           border: 0;  /* Small centering fix for Firefox */
+        }  
+
+        #autocomplete::-webkit-input-placeholder {
+           color: #9c9c9c;
+           font-style: italic;
+        }
+
+        #autocomplete:-moz-placeholder {
+           color: #9c9c9c;
+           font-style: italic;
+        }  
+
+        #autocomplete:-ms-placeholder {
+           color: #9c9c9c;
+           font-style: italic;
+        }
+        #autocomplete.placeholder {
+           color: #9c9c9c !important;
+           font-style: italic;
+        }   
+        #occupation
+        {
+        width:100%;
+        margin:5px 0 5px 0;
+        }
+	   
+        #occupation_small
+        {
+        width:100%;
+        margin:5px 0 15px 0px;
+        } 
+        
+        #two_dopdowns
+        {
+            text-align:left;
+        }
+        
+        #statedropdown
+        {
+        width:45%;
+        display:inline-block;
+        margin:0 20px 20px 0;
+
+        }
+        #jobpopularity {width:115%;}    
+
+        #jobpopularity option { color: black; }
+        .empty { color: gray; } 
+
+
+        #job_popu_frame
+        {
+	        width:40%;
+	        display:inline-block;
+	        margin:0 0 20px 20px;
+        }  
+#map_frame
+{    
+    width:60%;
+    padding:0px 20px 0px 20px;
+    margin:-50px 20px 10px 10px;
+    display:inline-block;
+    text-align:center;
+    /*background-color:#d1d2d4;*/
+}
+
+
+    
+select,#statedropdown {
+
+    padding:3px;
+
+    margin: 0;
+
+    -webkit-border-radius:4px;
+
+    -moz-border-radius:4px;
+
+    border-radius:4px;
+
+    /*-webkit-box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;
+
+    -moz-box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;
+
+    box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;*/
+
+    /*background: #f8f8f8;*/
+
+    background-image: -moz-linear-gradient(#58595b, #6d6e71);
+
+    background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #58595b),color-stop(1, #6d6e71));
+
+    color:#939597;
+    /*color:black;*/
+
+    border:none;
+
+    outline:none;
+
+    display: inline-block;
+
+    -webkit-appearance:none;
+
+    -moz-appearance:none;
+
+    appearance:none;
+
+    cursor:pointer;
+
+}
+
+
+
+/* Targetting Webkit browsers only. FF will show the dropdown arrow with so much padding. */
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+
+    select {padding-right:18px}
+
+}
+
+
+
+
+
+
+
+label[for="dropdown"] {position:relative}
+
+label[for="dropdown"]:after {
+
+    content:'>';
+
+    font:11px "Consolas", monospace;
+
+    color:#aaa;
+
+    -webkit-transform:rotate(90deg);
+
+    -moz-transform:rotate(90deg);
+
+    -ms-transform:rotate(90deg);
+
+    transform:rotate(90deg);
+
+    right:8px; top:2px;
+
+    padding:0 0 2px;
+
+    border-bottom:1px solid #ddd;
+
+    position:absolute;
+
+    pointer-events:none;
+
+}
+
+label[for="dropdown"]:before {
+
+    content:'';
+
+    right:6px; top:0px;
+
+    width:20px; height:20px;
+
+   /* background-image: -moz-linear-gradient(#58595b, #6d6e71);
+
+    background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #58595b),color-stop(1, #6d6e71));*/
+
+    position:absolute;
+
+    pointer-events:none;
+
+    display:block;
+
+}
+
+#occupation_small_label 
+{
+    display:none;
+    }
+
+
+
+#data_type_frame
+{
+   /* text-align:justify;*/
+    }
+
+/*-----radio btn r1 Job Opportunity---------*/    
+    
+input[type="radio"] {
+    display:none;
+}
+
+input[type="radio"] + label[for="r1"]{
+    color:#f2f2f2;
+    font-family:Arial, sans-serif;
+    font-size:12px;
+   
+
+}
+
+input[type="radio"] + label[for="r1"] span {
+    display:inline-block;
+    width:112px;
+    height:37px;
+    margin:-1px 4px 0 0;
+    vertical-align:middle;
+    background:url(check_radio_sheet.png) 0px top no-repeat;
+    cursor:pointer;
+    color:#71C27E;
+    text-align:center;
+    padding-top:4px;
+
+}
+
+input[type="radio"]:checked + label[for="r1"] span {
+    background:url(check_radio_sheet.png) -112px top no-repeat;
+    color:#3EA450;
+    padding-top:6px;
+    margin:-1px 4px 0 0;
+  
+}    
+    
+
+
+/*-----radio btn r2 Job Popularity---------*/    
+    
+
+input[type="radio"] + label[for="r2"]{
+    color:#f2f2f2;
+    font-family:Arial, sans-serif;
+    font-size:12px;
+
+}
+
+input[type="radio"] + label[for="r2"] span {
+    display:inline-block;
+    width:112px;
+    height:37px;
+    margin:-1px 4px 0 0;
+    vertical-align:middle;
+    background:url(check_radio_sheet.png) 0px top no-repeat;
+    cursor:pointer;
+    color:#FAAE53;
+    text-align:center;
+    padding-top:4px;
+
+}
+
+input[type="radio"]:checked + label[for="r2"] span {
+    background:url(check_radio_sheet.png) -112px top no-repeat;
+    color:#F68B1E;
+    padding-top:6px;
+    margin:-1px 4px 0 0;
+    
+}    
+    
+
+
+/*-----radio btn r3 Salary---------*/    
+    
+
+input[type="radio"] + label[for="r3"]{
+    color:#f2f2f2;
+    font-family:Arial, sans-serif;
+    font-size:12px;
+
+}
+
+input[type="radio"] + label[for="r3"] span {
+    display:inline-block;
+    width:112px;
+    height:37px;
+    margin:-1px 4px 0 0;
+    vertical-align:middle;
+    background:url(check_radio_sheet.png) 0px top no-repeat;
+    cursor:pointer;
+    color:#C6DCE7;
+    text-align:center;
+    padding-top:4px;
+
+}
+
+input[type="radio"]:checked + label[for="r3"] span {
+    background:url(check_radio_sheet.png) -112px top no-repeat;   
+    color:#27A9E1;
+    padding-top:6px;
+    margin:-1px 4px 0 0; 
+ 
+} 
+
+
+
+/*-----radio btn r4 Unemployment---------*/    
+    
+
+input[type="radio"] + label[for="r4"]{
+    color:#f2f2f2;
+    font-family:Arial, sans-serif;
+    font-size:11px;
+
+}
+
+input[type="radio"] + label[for="r4"] span {
+    display:inline-block;
+    width:112px;
+    height:37px;
+    margin:-1px 4px 0 0;
+    vertical-align:middle;
+    background:url(check_radio_sheet.png) 0px top no-repeat;
+    cursor:pointer;
+    color:#F2787A;
+    text-align:center;
+    padding-top:4px;
+}
+
+input[type="radio"]:checked + label[for="r4"] span {
+    background:url(check_radio_sheet.png) -112px top no-repeat;
+    color:#E14B4B;
+    padding-top:6px;
+    margin:-1px 4px 0 0;  
+} 
+
+/*---------------slider-------------------*/
+.ui-slider .ui-slider-handle {
+	position: absolute;
+	z-index: 2;
+	width: 15px;
+	height: 15px;
+	cursor: default;
+    border-radius:100px;
+}
+
+
+
+.ui-slider-horizontal {
+	height: 10px;
+	border:0px;
+	margin-top:5px;
+	background:#58585B
+}
+
+
+.ui-slider-horizontal .ui-slider-range {
+	top: 0;
+	height: 100%;
+	/*background:rgb(209,210,212);*/
+	background-image: -moz-linear-gradient(#D1D3D4, #BCBEC0);
+    background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #D1D3D4),color-stop(1, #BCBEC0));
+} 
+
+#slider-range{
+	background:#58585B;
+}  
+
