@@ -511,3 +511,6 @@ footer .footer-below {
     display: none;
     opacity: 0;
 }
+.list_inline_centered{
+    text-align: center;
+}
